@@ -172,6 +172,7 @@ void enablePullups()
 void leftISR()
 {
   leftTicks++;
+  leftRevs = leftTicks / COUNTS_PER_REV;
   Serial.print("LEFT: ");
   Serial.println(leftTicks);
 }
@@ -179,6 +180,7 @@ void leftISR()
 void rightISR()
 {
   rightTicks++;
+  rightRevs = rightTicks / COUNTS_PER_REV;
   Serial.print("RIGHT: ");
   Serial.println(rightTicks);
 }
