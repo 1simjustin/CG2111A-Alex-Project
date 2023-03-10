@@ -532,10 +532,13 @@ void handleCommand(TPacket *command)
   {
     // For movement commands, param[0] = distance, param[1] = speed.
     case COMMAND_FORWARD:
-        sendOK();
-        forward((float) command->params[0], (float) command->params[1]);
+      sendOK();
+      forward((float) command->params[0], (float) command->params[1]);
       break;
-
+    case COMMAND_TURN_LEFT:
+      sendOK();
+      left((float) command->params[0], (float) command->params[1]);
+      break;
     /*
      * Implement code for other commands here.
      * 
@@ -623,28 +626,18 @@ void loop() {
 
 // Uncomment the code below for Step 2 of Activity 3 in Week 8 Studio 2
   
-  forward(0, 100);
+  // forward(0, 100);
 
 // Uncomment the code below for Week 9 Studio 2
 
-/*
- // put your main code here, to run repeatedly:
   TPacket recvPacket; // This holds commands from the Pi
 
   TResult result = readPacket(&recvPacket);
   
   if(result == PACKET_OK)
     handlePacket(&recvPacket);
-  else
-    if(result == PACKET_BAD)
-    {
-      sendBadPacket();
-    }
-    else
-      if(result == PACKET_CHECKSUM_BAD)
-      {
-        sendBadChecksum();
-      } 
-      
-      */
+  else if (result == PACKET_BAD)
+    sendBadPacket();
+  else if(result == PACKET_CHECKSUM_BAD)
+    sendBadChecksum();
 }
