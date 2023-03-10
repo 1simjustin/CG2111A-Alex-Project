@@ -94,7 +94,18 @@ void sendStatus()
   // Use the params array to store this information, and set the
   // packetType and command files accordingly, then use sendResponse
   // to send out the packet. See sendMessage on how to use sendResponse.
-  //
+  
+  TPacket statusPacket;
+  statusPacket.packetType = PACKET_TYPE_RESPONSE;
+  statusPacket.command = RESP_STATUS;
+
+  unsigned long paramArray[10] = {leftForwardTicks, rightForwardTicks, leftReverseTicks, rightReverseTicks,
+  leftForwardTicksTurns, rightForwardTicksTurns, leftReverseTicksTurns, rightReverseTicksTurns, forwardDist, reverseDist};
+
+  for (int i=0; i<10; i++)
+    statusPacket.params[i] = paramArray[i];
+  
+  sendResponse(&statusPacket);
 }
 
 void sendMessage(const char *message)
@@ -530,18 +541,37 @@ void handleCommand(TPacket *command)
 {
   switch(command->command)
   {
+    // Stop command
     case COMMAND_STOP:
       sendOK();
       stop();
       break;
+
     // For movement commands, param[0] = distance, param[1] = speed.
     case COMMAND_FORWARD:
       sendOK();
       forward((float) command->params[0], (float) command->params[1]);
       break;
+    case COMMAND_REVERSE:
+      sendOK();
+      reverse((float) command->params[0], (float) command->params[1]);
+      break;
     case COMMAND_TURN_LEFT:
       sendOK();
       left((float) command->params[0], (float) command->params[1]);
+      break;
+    case COMMAND_TURN_RIGHT:
+      sendOK();
+      right((float) command->params[0], (float) command->params[1]);
+      break;
+
+    case COMMAND_GET_STATS:
+      sendStatus();
+      break;
+
+    case COMMAND_CLEAR_STATS:
+      sendOK();
+      clearOneCounter(command->params[0]);
       break;
     /*
      * Implement code for other commands here.
