@@ -61,6 +61,10 @@ volatile unsigned long rightRevs;
 volatile unsigned long forwardDist;
 volatile unsigned long reverseDist;
 
+// Variables to track whether we have moved a commanded distance
+unsigned long deltaDist;
+unsigned long newDist;
+
 
 /*
  * 
@@ -376,6 +380,14 @@ int pwmVal(float speed)
 // continue moving forward indefinitely.
 void forward(float dist, float speed)
 {
+  // Code to tell us how far to move
+  if (!dist)
+    deltaDist = 999999;
+  else
+    deltaDist = dist;
+  
+  newDist = forwardDist + deltaDist;
+
   dir = FORWARD;
 
   int val = pwmVal(speed);
