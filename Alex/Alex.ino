@@ -390,7 +390,7 @@ void forward(float dist, float speed)
 // continue reversing indefinitely.
 void reverse(float dist, float speed)
 {
-  dir = REVERSE;
+  dir = BACKWARD;
 
   int val = pwmVal(speed);
 
@@ -530,6 +530,10 @@ void handleCommand(TPacket *command)
 {
   switch(command->command)
   {
+    case COMMAND_STOP:
+      sendOK();
+      stop();
+      break;
     // For movement commands, param[0] = distance, param[1] = speed.
     case COMMAND_FORWARD:
       sendOK();
