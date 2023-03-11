@@ -455,6 +455,20 @@ void reverse(float dist, float speed)
   analogWrite(RF, 0);
 }
 
+// New function to estimate number of wheel ticks
+// needed to turn an angle
+unsigned long computeDeltaTicks (float ang) {
+  // We assume angular distance moved = linear distance moved by 1 wheel
+  // revolution. Incorrect but simplifies calculation.
+  // # of wheel revolutions to make 1 full 360 turn is alexCirc / WHEEL_CIRC
+  // For ang degrees, (ang * alexCirc) / (360 * WHEEL_CIRC)
+  // To convert to ticks, we multiply by COUNTS_PER_REV
+
+  unsigned long ticks = (unsigned long) ((ang * alexCirc * COUNTS_PER_REV) / (360 * WHEEL_CIRC));
+
+  return ticks;
+}
+
 // Turn Alex left "ang" degrees at speed "speed".
 // "speed" is expressed as a percentage. E.g. 50 is
 // turn left at half speed.
@@ -462,6 +476,12 @@ void reverse(float dist, float speed)
 // turn left indefinitely.
 void left(float ang, float speed)
 {
+  if(ang == 0)
+    deltaTicks = 99999999;
+  else
+    deltaTicks = computeDeltaTicks(ang);
+    targetTicks = leftReverseTicksTurns + deltaTicks;
+
   dir = LEFT;
 
   int val = pwmVal(speed);
@@ -483,6 +503,13 @@ void left(float ang, float speed)
 // turn right indefinitely.
 void right(float ang, float speed)
 {
+  if(ang == 0)
+    deltaTicks = 99999999;
+  else
+    deltaTicks = computeDeltaTicks(ang);
+    targetTicks = rightReverseTicksTurns + deltaTicks;
+    // verify if rightReverseTicksTurns or leftForwardTicksTurns
+
   dir = RIGHT;
 
   int val = pwmVal(speed);
@@ -694,6 +721,7 @@ void handlePacket(TPacket *packet)
 }
 
 // Function to control movement
+
 void movement() {
   if(deltaDist > 0) {
     if(dir == FORWARD) {
@@ -717,6 +745,32 @@ void movement() {
       newDist = 0;
       stop();
     }
+  }
+}
+
+// Function to control rotation
+
+void turning() {
+  if (dir == LEFT) {
+    if (leftReverseTicksTurns >= targetTicks) {
+      deltaTicks = 0;
+      targetTicks = 0;
+      stop();
+    }
+  }
+
+  else if (dir == RIGHT) {
+    if (rightReverseTicksTurns >= targetTicks) {
+      deltaTicks = 0;
+      targetTicks = 0;
+      stop();
+    }
+  }
+
+  else if (dir == STOP) {
+    deltaTicks = 0;
+    targetTicks = 0;
+    stop();
   }
 }
 
