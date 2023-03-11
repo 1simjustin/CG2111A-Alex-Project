@@ -1,3 +1,4 @@
+#include <math.h>
 #include <serialize.h>
 
 #include "packet.h"
@@ -35,6 +36,19 @@ volatile TDirection dir = STOP;
 #define RF                  10  // Right forward pin
 #define RR                  11  // Right reverse pin
 
+// PI, for calculating turn circumference
+#define PI                  3.141592654
+
+// Alex Length & Breadth in cm    // TO BE UPDATED
+#define ALEX_LENGTH         20
+#define ALEX_BREADTH        20
+
+// Alex's diagonal. Compute and stored once
+const float alexDiagonal = sqrt((ALEX_LENGTH * ALEX_LENGTH) + (ALEX_BREADTH * ALEX_BREADTH));
+
+// Alex's turning circumference, calculated once
+const float alexCirc = PI * alexDiagonal;
+
 /*
  *    Alex's State Variables
  */
@@ -64,6 +78,9 @@ volatile unsigned long reverseDist;
 // Variables to track whether we have moved a commanded distance
 unsigned long deltaDist;
 unsigned long newDist;
+
+unsigned long deltaTicks;
+unsigned long targetTicks;
 
 
 /*
@@ -413,6 +430,14 @@ void forward(float dist, float speed)
 // continue reversing indefinitely.
 void reverse(float dist, float speed)
 {
+  // Code to tell us how far to move
+  if (!dist)
+    deltaDist = 999999;
+  else
+    deltaDist = dist;
+  
+  newDist = reverseDist + deltaDist;
+
   dir = BACKWARD;
 
   int val = pwmVal(speed);
@@ -668,6 +693,33 @@ void handlePacket(TPacket *packet)
   }
 }
 
+// Function to control movement
+void movement() {
+  if(deltaDist > 0) {
+    if(dir == FORWARD) {
+      if(forwardDist >= newDist) {
+        deltaDist = 0;
+        newDist = 0;
+        stop();
+      }
+    }
+
+    else if(dir == BACKWARD) {
+      if(reverseDist >= newDist) {
+        deltaDist = 0;
+        newDist = 0;
+        stop();
+      }
+    }
+
+    else if(dir == STOP) {
+      deltaDist = 0;
+      newDist = 0;
+      stop();
+    }
+  }
+}
+
 void loop() {
 
 // Uncomment the code below for Step 2 of Activity 3 in Week 8 Studio 2
@@ -686,4 +738,6 @@ void loop() {
     sendBadPacket();
   else if(result == PACKET_CHECKSUM_BAD)
     sendBadChecksum();
+
+  move();
 }
