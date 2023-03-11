@@ -794,4 +794,5 @@ void loop() {
     sendBadChecksum();
 
   move();
+  turning();
 }
