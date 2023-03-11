@@ -40,8 +40,8 @@ volatile TDirection dir = STOP;
 #define PI                  3.141592654
 
 // Alex Length & Breadth in cm    // TO BE UPDATED
-#define ALEX_LENGTH         20
-#define ALEX_BREADTH        20
+#define ALEX_LENGTH         17.5
+#define ALEX_BREADTH        11
 
 // Alex's diagonal. Compute and stored once
 const float alexDiagonal = sqrt((ALEX_LENGTH * ALEX_LENGTH) + (ALEX_BREADTH * ALEX_BREADTH));
