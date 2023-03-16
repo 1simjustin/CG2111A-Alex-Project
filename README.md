@@ -1,8 +1,8 @@
-# CG2111A Alex Project AY 22/23
+# CG2111A AY 22/23 Alex Project
 
 ## Studio B03 Group 4B
 Members:
-- [Justin]
-- [Zhong Heng]
-- [Suveen]
-- [Kiran]
+- Justin
+- Zhong Heng
+- Suveen
+- Kiran
