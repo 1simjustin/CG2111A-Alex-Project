@@ -6,7 +6,7 @@
 #include "netconstants.h"
 
 // Packet types, error codes, etc.
-#include "constants.h"
+#include "Alex/constants.h"
 
 // Tells us that the network is running.
 static volatile int networkActive=0;
