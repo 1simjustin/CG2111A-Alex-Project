@@ -1,4 +1,4 @@
-#include "headers/make_tls_client.h"
+#include "../headers/make_tls_client.h"
 
 // Our reader thread just reads the socket connection and prints it
 void *readerThread(void *conn) {
@@ -50,10 +50,10 @@ void *writerThread(void *conn) {
 }
 
 #define SERVER_NAME "172.20.10.11"
-#define CA_CERT_FNAME "network/signing.pem"
+#define CA_CERT_FNAME "../network/signing.pem"
 #define PORT_NUM 5000
-#define CLIENT_CERT_FNAME "network/laptop.crt"
-#define CLIENT_KEY_FNAME "network/laptop.key"
+#define CLIENT_CERT_FNAME "../network/laptop.crt"
+#define CLIENT_KEY_FNAME "../network/laptop.key"
 #define SERVER_NAME_ON_CERT "alex.epp.com"
 
 int main() {
