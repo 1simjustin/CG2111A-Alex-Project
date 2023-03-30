@@ -1,9 +1,9 @@
 
 // Routines to create a TLS client
-#include "make_tls_client.h"
+#include "headers/make_tls_client.h"
 
 // Network packet types
-#include "netconstants.h"
+#include "headers/netconstants.h"
 
 // Packet types, error codes, etc.
 #include "Alex/constants.h"
@@ -222,9 +222,9 @@ void *writerThread(void *conn)
 /* TODO: #define filenames for the client private key, certificatea,
    CA filename, etc. that you need to create a client */
 
-#define clientPrivateKey		"laptop.key"
-#define clientCertFname			"laptop.crt"
-#define caCertFname				"signing.pem"
+#define clientPrivateKey		"network/laptop.key"
+#define clientCertFname			"network/laptop.crt"
+#define caCertFname				"network/signing.pem"
 
 // #define serverIP				"172.20.10.11"
 // #define portNum				5000
