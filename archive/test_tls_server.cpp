@@ -1,12 +1,12 @@
-#include "make_tls_server.h"
-#include "tls_common_lib.h"
+#include "../headers/make_tls_server.h"
+#include "../headers/tls_common_lib.h"
 
 #include <stdio.h>
 
 #define PORTNUM 5000
-#define KEY_FNAME   "alex.key"
-#define CERT_FNAME  "alex.crt"
-#define CA_CERT_FNAME   "signing.pem"
+#define KEY_FNAME   "../network/alex.key"
+#define CERT_FNAME  "../network/alex.crt"
+#define CA_CERT_FNAME   "../network/signing.pem"
 #define CLIENT_NAME     "laptop.epp.com"
 
 
