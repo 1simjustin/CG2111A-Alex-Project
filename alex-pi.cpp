@@ -4,8 +4,8 @@
 #include <unistd.h>
 #include <stdint.h>
 #include "Alex/packet.h"
-#include "serial.h"
-#include "serialize.h"
+#include "headers/serial.h"
+#include "headers/serialize.h"
 #include "Alex/constants.h"
 
 #define PORT_NAME			"/dev/ttyACM0"
