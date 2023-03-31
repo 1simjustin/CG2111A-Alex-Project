@@ -31,10 +31,10 @@ volatile TDirection dir = STOP;
 
 // Motor control pins. You need to adjust these till
 // Alex moves in the correct direction
-#define LF                  6   // Left forward pin
-#define LR                  5   // Left reverse pin
-#define RF                  10  // Right forward pin
-#define RR                  11  // Right reverse pin
+#define LF                  5   // Left forward pin
+#define LR                  6   // Left reverse pin
+#define RF                  11  // Right forward pin
+#define RR                  10  // Right reverse pin
 
 // PI, for calculating turn circumference
 #define PI                  3.141592654
@@ -751,36 +751,32 @@ void movement() {
 // Function to control rotation
 
 void turning() {
-  if (dir == LEFT) {
-    if (leftReverseTicksTurns >= targetTicks) {
+  if(deltaTicks >= 0) {
+    if (dir == LEFT) {
+      if (leftReverseTicksTurns >= targetTicks) {
+        deltaTicks = 0;
+        targetTicks = 0;
+        stop();
+      }
+    }
+
+    else if (dir == RIGHT) {
+      if (rightReverseTicksTurns >= targetTicks) {
+        deltaTicks = 0;
+        targetTicks = 0;
+        stop();
+      }
+    }
+
+    else if (dir == STOP) {
       deltaTicks = 0;
       targetTicks = 0;
       stop();
     }
-  }
-
-  else if (dir == RIGHT) {
-    if (rightReverseTicksTurns >= targetTicks) {
-      deltaTicks = 0;
-      targetTicks = 0;
-      stop();
-    }
-  }
-
-  else if (dir == STOP) {
-    deltaTicks = 0;
-    targetTicks = 0;
-    stop();
   }
 }
 
 void loop() {
-
-// Uncomment the code below for Step 2 of Activity 3 in Week 8 Studio 2
-  
-  // forward(0, 100);
-
-// Uncomment the code below for Week 9 Studio 2
 
   TPacket recvPacket; // This holds commands from the Pi
 
@@ -793,6 +789,6 @@ void loop() {
   else if(result == PACKET_CHECKSUM_BAD)
     sendBadChecksum();
 
-  move();
+  movement();
   turning();
 }
