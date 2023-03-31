@@ -1,3 +1,4 @@
+#include <math.h>
 #include <serialize.h>
 
 #include "packet.h"
@@ -73,6 +74,13 @@ volatile unsigned long rightRevs;
 // Forward and backward distance traveled
 volatile unsigned long forwardDist;
 volatile unsigned long reverseDist;
+
+// Variables to track whether we have moved a commanded distance
+unsigned long deltaDist;
+unsigned long newDist;
+
+unsigned long deltaTicks;
+unsigned long targetTicks;
 
 
 /*
@@ -389,6 +397,14 @@ int pwmVal(float speed)
 // continue moving forward indefinitely.
 void forward(float dist, float speed)
 {
+  // Code to tell us how far to move
+  if (!dist)
+    deltaDist = 999999;
+  else
+    deltaDist = dist;
+  
+  newDist = forwardDist + deltaDist;
+
   dir = FORWARD;
 
   int val = pwmVal(speed);
@@ -414,6 +430,14 @@ void forward(float dist, float speed)
 // continue reversing indefinitely.
 void reverse(float dist, float speed)
 {
+  // Code to tell us how far to move
+  if (!dist)
+    deltaDist = 999999;
+  else
+    deltaDist = dist;
+  
+  newDist = reverseDist + deltaDist;
+
   dir = BACKWARD;
 
   int val = pwmVal(speed);
@@ -431,6 +455,20 @@ void reverse(float dist, float speed)
   analogWrite(RF, 0);
 }
 
+// New function to estimate number of wheel ticks
+// needed to turn an angle
+unsigned long computeDeltaTicks (float ang) {
+  // We assume angular distance moved = linear distance moved by 1 wheel
+  // revolution. Incorrect but simplifies calculation.
+  // # of wheel revolutions to make 1 full 360 turn is alexCirc / WHEEL_CIRC
+  // For ang degrees, (ang * alexCirc) / (360 * WHEEL_CIRC)
+  // To convert to ticks, we multiply by COUNTS_PER_REV
+
+  unsigned long ticks = (unsigned long) ((ang * alexCirc * COUNTS_PER_REV) / (360 * WHEEL_CIRC));
+
+  return ticks;
+}
+
 // Turn Alex left "ang" degrees at speed "speed".
 // "speed" is expressed as a percentage. E.g. 50 is
 // turn left at half speed.
@@ -438,6 +476,12 @@ void reverse(float dist, float speed)
 // turn left indefinitely.
 void left(float ang, float speed)
 {
+  if(ang == 0)
+    deltaTicks = 99999999;
+  else
+    deltaTicks = computeDeltaTicks(ang);
+    targetTicks = leftReverseTicksTurns + deltaTicks;
+
   dir = LEFT;
 
   int val = pwmVal(speed);
@@ -459,6 +503,13 @@ void left(float ang, float speed)
 // turn right indefinitely.
 void right(float ang, float speed)
 {
+  if(ang == 0)
+    deltaTicks = 99999999;
+  else
+    deltaTicks = computeDeltaTicks(ang);
+    targetTicks = rightReverseTicksTurns + deltaTicks;
+    // verify if rightReverseTicksTurns or leftForwardTicksTurns
+
   dir = RIGHT;
 
   int val = pwmVal(speed);
@@ -669,13 +720,63 @@ void handlePacket(TPacket *packet)
   }
 }
 
+// Function to control movement
+
+void movement() {
+  if(deltaDist > 0) {
+    if(dir == FORWARD) {
+      if(forwardDist >= newDist) {
+        deltaDist = 0;
+        newDist = 0;
+        stop();
+      }
+    }
+
+    else if(dir == BACKWARD) {
+      if(reverseDist >= newDist) {
+        deltaDist = 0;
+        newDist = 0;
+        stop();
+      }
+    }
+
+    else if(dir == STOP) {
+      deltaDist = 0;
+      newDist = 0;
+      stop();
+    }
+  }
+}
+
+// Function to control rotation
+
+void turning() {
+  if(deltaTicks >= 0) {
+    if (dir == LEFT) {
+      if (leftReverseTicksTurns >= targetTicks) {
+        deltaTicks = 0;
+        targetTicks = 0;
+        stop();
+      }
+    }
+
+    else if (dir == RIGHT) {
+      if (rightReverseTicksTurns >= targetTicks) {
+        deltaTicks = 0;
+        targetTicks = 0;
+        stop();
+      }
+    }
+
+    else if (dir == STOP) {
+      deltaTicks = 0;
+      targetTicks = 0;
+      stop();
+    }
+  }
+}
+
 void loop() {
-
-// Uncomment the code below for Step 2 of Activity 3 in Week 8 Studio 2
-  
-  // forward(0, 100);
-
-// Uncomment the code below for Week 9 Studio 2
 
   TPacket recvPacket; // This holds commands from the Pi
 
@@ -687,4 +788,7 @@ void loop() {
     sendBadPacket();
   else if(result == PACKET_CHECKSUM_BAD)
     sendBadChecksum();
+
+  movement();
+  turning();
 }
