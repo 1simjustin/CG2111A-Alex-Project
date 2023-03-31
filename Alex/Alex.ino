@@ -35,6 +35,19 @@ volatile TDirection dir = STOP;
 #define RF                  11  // Right forward pin
 #define RR                  10  // Right reverse pin
 
+// PI, for calculating turn circumference
+#define PI                  3.141592654
+
+// Alex Length & Breadth in cm    // TO BE UPDATED
+#define ALEX_LENGTH         17.5
+#define ALEX_BREADTH        11
+
+// Alex's diagonal. Compute and stored once
+const float alexDiagonal = sqrt((ALEX_LENGTH * ALEX_LENGTH) + (ALEX_BREADTH * ALEX_BREADTH));
+
+// Alex's turning circumference, calculated once
+const float alexCirc = PI * alexDiagonal;
+
 /*
  *    Alex's State Variables
  */
