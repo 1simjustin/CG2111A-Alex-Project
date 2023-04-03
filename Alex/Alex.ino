@@ -442,7 +442,7 @@ void sendColor()
   // to send out the packet. See sendMessage on how to use sendResponse.
   
   TPacket colorPacket;
-  statusPacket.packetType = PACKET_TYPE_RESPONSE;
+  statusPacket.packetType = PACKET_TYPE_MESSAGE;
   statusPacket.command = RESP_STATUS;
 
   statusPacket.params = color;
