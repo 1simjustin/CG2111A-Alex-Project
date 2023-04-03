@@ -49,6 +49,19 @@ const float alexDiagonal = sqrt((ALEX_LENGTH * ALEX_LENGTH) + (ALEX_BREADTH * AL
 // Alex's turning circumference, calculated once
 const float alexCirc = PI * alexDiagonal;
 
+// Colour Init
+#define s0 A0
+#define s1 A1
+#define out A2
+#define s2 A3
+#define s3 A4
+
+int redColor = 0;
+int blueColor = 0;
+int greenColor = 0;
+int data = 0;
+int color = 0;
+
 /*
  *    Alex's State Variables
  */
@@ -378,6 +391,65 @@ void startMotors()
   
 }
 
+void setupColor() {
+  pinMode(s0, OUTPUT);
+  pinMode(s1, OUTPUT);
+  pinMode(s2, OUTPUT);
+  pinMode(s3, OUTPUT);
+  pinMode(out, INPUT);
+
+  digitalWrite(s0, HIGH);
+  digitalWrite(s1, HIGH);
+}
+
+void color_check() {
+  digitalWrite(s2, LOW);       //S2/S3 levels define which set of photodiodes we are using LOW/LOW is for RED LOW/HIGH is for Blue and HIGH/HIGH is for green
+  digitalWrite(s3, LOW);
+  redColor = pulseIn(out, LOW); //here we wait until "out" go LOW, we start measuring the duration      and stops when "out" is HIGH again
+  delay(20);
+
+  digitalWrite(s2, LOW);
+  digitalWrite(s3, HIGH);
+  blueColor = pulseIn(out, LOW); //here we wait until "out" go LOW, we start measuring the duration and stops when "out" is HIGH again
+  delay(20);
+
+  digitalWrite(s2, HIGH);
+  digitalWrite(s3, HIGH);
+  greenColor = pulseIn(out, LOW); //here we wait until "out" go LOW, we start measuring the duration and stops when "out" is HIGH again
+  delay(20);
+
+
+  if (redColor > 29 && redColor < 63 && blueColor > 39 && blueColor < 70 && greenColor > 57 && greenColor < 98 ) {
+    color = 1;
+  } else if (redColor > 47 && redColor < 77 && blueColor > 37 && blueColor < 67 && greenColor > 40 && greenColor < 70) {
+    color = 2;
+  } else if (redColor > 21 && redColor < 60 && blueColor > 14 && blueColor < 60 && greenColor > 17 && greenColor < 60) {
+    color = 3;
+  } else {
+    color = 0;
+  }
+
+  delay(200);
+}
+
+void sendColor()
+{
+  // Implement code to send back a packet containing key
+  // information like leftTicks, rightTicks, leftRevs, rightRevs
+  // forwardDist and reverseDist
+  // Use the params array to store this information, and set the
+  // packetType and command files accordingly, then use sendResponse
+  // to send out the packet. See sendMessage on how to use sendResponse.
+  
+  TPacket colorPacket;
+  statusPacket.packetType = PACKET_TYPE_RESPONSE;
+  statusPacket.command = RESP_STATUS;
+
+  statusPacket.params = color;
+  
+  sendResponse(&statusPacket);
+}
+
 // Convert percentages to PWM values
 int pwmVal(float speed)
 {
@@ -616,14 +688,17 @@ void handleCommand(TPacket *command)
       sendOK();
       forward((float) command->params[0], (float) command->params[1]);
       break;
+
     case COMMAND_REVERSE:
       sendOK();
       reverse((float) command->params[0], (float) command->params[1]);
       break;
+
     case COMMAND_TURN_LEFT:
       sendOK();
       left((float) command->params[0], (float) command->params[1]);
       break;
+
     case COMMAND_TURN_RIGHT:
       sendOK();
       right((float) command->params[0], (float) command->params[1]);
@@ -637,10 +712,11 @@ void handleCommand(TPacket *command)
       sendOK();
       clearOneCounter(command->params[0]);
       break;
-    /*
-     * Implement code for other commands here.
-     * 
-     */
+
+    case COMMAND_GET_COLOR:
+      color_check();
+      sendColor();
+      break;
         
     default:
       sendBadCommand();
