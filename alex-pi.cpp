@@ -227,6 +227,12 @@ void sendCommand(char command)
 			sendPacket(&commandPacket);
 			break;
 
+		case 'i':
+		case 'I':
+			commandPacket.command = COMMAND_GET_COLOR;
+			sendPacket(&commandPacket);
+			break;
+
 		case 'q':
 		case 'Q':
 			exitFlag=1;
