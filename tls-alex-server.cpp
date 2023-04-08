@@ -18,9 +18,9 @@
 /* TODO: #define constants for the  filenames for Alex's private key, certificate, CA certificate name,
         and the Common Name for your laptop */
 
-#define keyFilename			"alex.key"
-#define certFilename		"alex.crt"
-#define caCertFilename		"signing.pem"
+#define keyFilename			"network/alex.key"
+#define certFilename		"network/alex.crt"
+#define caCertFilename		"network/signing.pem"
 #define peerName			"laptop.epp.com"
 
 /* END TODO */

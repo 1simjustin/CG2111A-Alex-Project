@@ -6,11 +6,10 @@ E-mail: kint.zhao@slamtec.com
  -->
 <launch>
 
-  <node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="1 0 0 0 0 0 base_link laser 100" /> <!--change -->
+  <node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="0 0 0 0 0 0 base_link laser 100" />  
 
-
-    <node pkg="hector_mapping" type="hector_mapping" name="hector_height_mapping" output="screen">
-      <param name="scan_topic" value="scan" />
+  <node pkg="hector_mapping" type="hector_mapping" name="hector_height_mapping" output="screen">
+    <param name="scan_topic" value="scan" />
     <param name="base_frame" value="base_link" />
     <param name="odom_frame" value="base_link" />
 
@@ -34,6 +33,9 @@ E-mail: kint.zhao@slamtec.com
 
   </node>
 
-
+  <node pkg="tf" type="static_transform_publisher" name="alex_tl" args="0.12 0.105 0 0 0 0 base_link TL 100" />
+  <node pkg="tf" type="static_transform_publisher" name="alex_tr" args="0.12 -0.105 0 0 0 0 base_link TR 100" />
+  <node pkg="tf" type="static_transform_publisher" name="alex_bl" args="-0.13 0.105 0 0 0 0 base_link BL 100" />
+  <node pkg="tf" type="static_transform_publisher" name="alex_br" args="-0.13 -0.105 0 0 0 0 base_link BR 100" />
 
 </launch>
