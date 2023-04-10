@@ -176,33 +176,47 @@ void *writerThread(void *conn)
 		buffer[0] = NET_COMMAND_PACKET;
 		switch(ch)
 		{
-			case 'f':
-			case 'F':
-			case 'b':
-			case 'B':
-			case 'l':
-			case 'L':
-			case 'r':
-			case 'R':
-						getParams(params);
-						buffer[1] = ch;
-						memcpy(&buffer[2], params, sizeof(params));
-						sendData(conn, buffer, sizeof(buffer));
-						break;
+			case 'w':
+			case 'a':
 			case 's':
+			case 'd':
+				getParams(params);
+				buffer[1] = ch;
+				memcpy(&buffer[2], params, sizeof(params));
+				sendData(conn, buffer, sizeof(buffer));
+				break;
+
+			case 'W':
 			case 'S':
+				params[0] = 5;
+				params[1] = 70;
+				buffer[1] = ch;
+				memcpy(&buffer[2], params, sizeof(params));
+				sendData(conn, buffer, sizeof(buffer));
+				break;
+			case 'A':
+			case 'D':
+				params[0] = 10;
+				params[1] = 70;
+				buffer[1] = ch;
+				memcpy(&buffer[2], params, sizeof(params));
+				sendData(conn, buffer, sizeof(buffer));
+				break;
+
+			case 'e': // e to stop
+			case 'E':
 			case 'c':
 			case 'C':
 			case 'g':
 			case 'G':
 			case 'i':
 			case 'I':
-					params[0]=0;
-					params[1]=0;
-					memcpy(&buffer[2], params, sizeof(params));
-					buffer[1] = ch;
-					sendData(conn, buffer, sizeof(buffer));
-					break;
+				params[0] = 0;
+				params[1] = 0;
+				memcpy(&buffer[2], params, sizeof(params));
+				buffer[1] = ch;
+				sendData(conn, buffer, sizeof(buffer));
+				break;
 			case 'q':
 			case 'Q':
 				quit=1;
