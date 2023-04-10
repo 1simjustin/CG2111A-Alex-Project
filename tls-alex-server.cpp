@@ -13,15 +13,15 @@
 #define BAUD_RATE			B9600
 
 // TLS Port Number
-#define SERVER_PORT			5000
+#define PORTNUM				5000
 
 /* TODO: #define constants for the  filenames for Alex's private key, certificate, CA certificate name,
         and the Common Name for your laptop */
 
-#define keyFilename			"alex.key"
-#define certFilename		"alex.crt"
-#define caCertFilename		"signing.pem"
-#define peerName			"laptop.epp.com"
+#define KEY_FNAME			"alex.key"
+#define CERT_FNAME			"alex.crt"
+#define CA_CERT_FNAME		"signing.pem"
+#define CLIENT_NAME			"laptop.epp.com"
 
 /* END TODO */
 
@@ -200,7 +200,7 @@ void sendNetworkData(const char *data, int len)
               connection we want to write to. */
 
 			// int sslWrite(void *conn, const char *buffer, int len);
-			sslWrite(tls_conn, data, len);
+			c = sslWrite(tls_conn, data, sizeof(data));
 
             /* END TODO */
 
@@ -310,7 +310,7 @@ void *worker(void *conn)
 		/* TODO: Implement SSL read into buffer */
 
 		// int sslRead(void *conn, char *buffer, int len);
-		sslRead(conn, buffer, BUF_LEN);
+		len = sslRead(conn, buffer, sizeof(buffer));
 
 		/* END TODO */
 		// As long as we are getting data, network is active
@@ -364,7 +364,7 @@ int main()
         Alex's certificate. Use the #define names you defined earlier  */
 
 	// void createServer(const char *keyFilename, const char *certFilename, int portNum, void *(*workerThread)(void *), const char *caCertFilename, const char *peerName, int verifyPeer);
-	createServer(keyFilename, certFilename, SERVER_PORT, &worker, caCertFilename, peerName, 1);
+	createServer(KEY_FNAME, CERT_FNAME, PORTNUM, &worker, CA_CERT_FNAME, CLIENT_NAME, 1);
 
     /* TODO END */
 
