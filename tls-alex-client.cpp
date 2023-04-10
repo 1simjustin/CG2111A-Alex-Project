@@ -164,7 +164,7 @@ void *writerThread(void *conn)
 	while(!quit)
 	{
 		char ch;
-		printf("Command (f=forward, b=reverse, l=turn left, r=turn right, s=stop, c=clear stats, g=get stats, i= get color, q=exit)\n");
+		printf("Command (w=forward, s=reverse, a=left, d=right, e=stop, c=clear stats, g=get stats, i= get color, q=exit)\n");
 		scanf("%c", &ch);
 
 		// Purge extraneous characters from input stream
