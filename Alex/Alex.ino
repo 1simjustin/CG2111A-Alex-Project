@@ -442,12 +442,12 @@ void sendColor()
   // to send out the packet. See sendMessage on how to use sendResponse.
   
   TPacket colorPacket;
-  statusPacket.packetType = PACKET_TYPE_MESSAGE;
-  statusPacket.command = RESP_STATUS;
+  colorPacket.packetType = PACKET_TYPE_MESSAGE;
+  colorPacket.command = RESP_STATUS;
 
-  statusPacket.params = color;
+  colorPacket.params[0] = color;
   
-  sendResponse(&statusPacket);
+  sendResponse(&colorPacket);
 }
 
 // Convert percentages to PWM values
@@ -490,7 +490,7 @@ void forward(float dist, float speed)
   // This will be replaced later with bare-metal code.
   
   analogWrite(LF, val);
-  analogWrite(RF, val);
+  analogWrite(RF, val*0.9);
   analogWrite(LR,0);
   analogWrite(RR, 0);
 }
@@ -522,7 +522,7 @@ void reverse(float dist, float speed)
   // RF = Right forward pin, RR = Right reverse pin
   // This will be replaced later with bare-metal code.
   analogWrite(LR, val);
-  analogWrite(RR, val);
+  analogWrite(RR, val*0.9);
   analogWrite(LF, 0);
   analogWrite(RF, 0);
 }
@@ -552,33 +552,6 @@ void left(float ang, float speed)
     deltaTicks = 99999999;
   else
     deltaTicks = computeDeltaTicks(ang);
-    targetTicks = leftReverseTicksTurns + deltaTicks;
-
-  dir = LEFT;
-
-  int val = pwmVal(speed);
-
-  // For now we will ignore ang. We will fix this in Week 9.
-  // We will also replace this code with bare-metal later.
-  // To turn left we reverse the left wheel and move
-  // the right wheel forward.
-  analogWrite(LR, val);
-  analogWrite(RF, val);
-  analogWrite(LF, 0);
-  analogWrite(RR, 0);
-}
-
-// Turn Alex right "ang" degrees at speed "speed".
-// "speed" is expressed as a percentage. E.g. 50 is
-// turn left at half speed.
-// Specifying an angle of 0 degrees will cause Alex to
-// turn right indefinitely.
-void right(float ang, float speed)
-{
-  if(ang == 0)
-    deltaTicks = 99999999;
-  else
-    deltaTicks = computeDeltaTicks(ang);
     targetTicks = rightReverseTicksTurns + deltaTicks;
     // verify if rightReverseTicksTurns or leftForwardTicksTurns
 
@@ -594,6 +567,33 @@ void right(float ang, float speed)
   analogWrite(LF, val);
   analogWrite(LR, 0);
   analogWrite(RF, 0);
+}
+
+// Turn Alex right "ang" degrees at speed "speed".
+// "speed" is expressed as a percentage. E.g. 50 is
+// turn left at half speed.
+// Specifying an angle of 0 degrees will cause Alex to
+// turn right indefinitely.
+void right(float ang, float speed)
+{
+  if(ang == 0)
+    deltaTicks = 99999999;
+  else
+    deltaTicks = computeDeltaTicks(ang);
+    targetTicks = leftReverseTicksTurns + deltaTicks;
+
+  dir = LEFT;
+
+  int val = pwmVal(speed);
+
+  // For now we will ignore ang. We will fix this in Week 9.
+  // We will also replace this code with bare-metal later.
+  // To turn left we reverse the left wheel and move
+  // the right wheel forward.
+  analogWrite(LR, val);
+  analogWrite(RF, val);
+  analogWrite(LF, 0);
+  analogWrite(RR, 0);
 }
 
 // Stop Alex. To replace with bare-metal code later.
