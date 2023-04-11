@@ -1,12 +1,12 @@
 
 // Routines to create a TLS client
-#include "headers/make_tls_client.h"
+#include "make_tls_client.h"
 
 // Network packet types
-#include "headers/netconstants.h"
+#include "netconstants.h"
 
 // Packet types, error codes, etc.
-#include "headers/constants.h"
+#include "constants.h"
 
 // Tells us that the network is running.
 static volatile int networkActive=0;
@@ -239,10 +239,10 @@ void *writerThread(void *conn)
    CA filename, etc. that you need to create a client */
 
 #define SERVER_NAME 			"172.20.10.11"
-#define CA_CERT_FNAME 			"network/signing.pem"
+#define CA_CERT_FNAME 			"signing.pem"
 #define PORT_NUM 				5000
-#define CLIENT_CERT_FNAME 		"network/laptop.crt"
-#define CLIENT_KEY_FNAME 		"network/laptop.key"
+#define CLIENT_CERT_FNAME 		"laptop.crt"
+#define CLIENT_KEY_FNAME 		"laptop.key"
 #define SERVER_NAME_ON_CERT 	"alex.epp.com"
 
 /* END TODO */
