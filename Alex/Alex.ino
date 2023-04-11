@@ -418,15 +418,14 @@ void color_check() {
   greenColor = pulseIn(out,LOW);
   delay(20);
   
-  if (redColor > 57 && redColor < 73 &&  greenColor > 109 && greenColor < 126 ) {
-  color = 1;
-  }
-  else if (redColor > 91 && redColor < 109  && greenColor > 77 && greenColor < 95) {
-  color = 2;
-  }
-  else {
-  color = 0; 
-  }
+  if (redColor > 57 && redColor < 73 &&  greenColor > 109 && greenColor < 126 )
+    color = 1;
+  
+  else if (redColor > 91 && redColor < 109  && greenColor > 77 && greenColor < 95)
+    color = 2;
+  
+  else 
+    color = 0; 
 
   delay(200);  
 }
