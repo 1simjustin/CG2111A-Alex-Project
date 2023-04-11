@@ -68,6 +68,7 @@ void handleColor(const char *buffer)
 	printf("Red:\t\t%d\n", data[0]);
 	printf("Green:\t\t%d\n", data[1]);
 	printf("Blue:\t\t%d\n", data[2]);
+	printf("Distance: \t%d\n", data[3]);
 	printf("\n---------------------------------------\n\n");
 }
 
