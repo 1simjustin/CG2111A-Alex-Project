@@ -59,19 +59,6 @@ void handleStatus(const char *buffer)
 	printf("\n---------------------------------------\n\n");
 }
 
-void handleColor(const char *buffer)
-{
-	int32_t data[16];
-	memcpy(data, &buffer[1], sizeof(data));
-
-	printf("\n ------- ALEX COLOR REPORT ------- \n\n");
-	printf("Red:\t\t%d\n", data[0]);
-	printf("Green:\t\t%d\n", data[1]);
-	printf("Blue:\t\t%d\n", data[2]);
-	printf("Distance: \t%d\n", data[3]);
-	printf("\n---------------------------------------\n\n");
-}
-
 void handleMessage(const char *buffer)
 {
 	printf("MESSAGE FROM ALEX: %s\n", &buffer[1]);
@@ -105,10 +92,6 @@ void handleNetwork(const char *buffer, int len)
 
 		case NET_COMMAND_PACKET:
 		handleCommand(buffer);
-		break;
-
-		case NET_COLOR_PACKET:
-		handleColor(buffer);
 		break;
 	}
 }
