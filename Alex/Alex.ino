@@ -430,7 +430,7 @@ int calchue(int color[3]) {
   float max = color[0];
   float min = color[0];
 
-  for (int i = 0; i < 3; i++) {
+  for (int i = 1; i < 3; i++) {
     if (max < color[i])
       max = color[i];
     if (min > color[i])
