@@ -242,13 +242,6 @@ void enablePullups()
 // Functions to be called by INT0 and INT1 ISRs.
 void leftISR()
 {
-  /*
-  leftTicks++;
-  leftRevs = leftTicks / COUNTS_PER_REV;
-  Serial.print("LEFT: ");
-  Serial.println(leftTicks);
-  */
-
   switch (dir) {
     case FORWARD:
       leftForwardTicks++;
@@ -267,14 +260,8 @@ void leftISR()
   }
 }
 
-void rightISR() {
-  /*
-  rightTicks++;
-  rightRevs = rightTicks / COUNTS_PER_REV;
-  Serial.print("RIGHT: ");
-  Serial.println(rightTicks);
-  */
-  
+void rightISR()
+{
   switch (dir) {
     case FORWARD:
       rightForwardTicks++;
@@ -629,45 +616,7 @@ void clearCounters()
   reverseDist=0; 
 }
 
-// Clears one particular counter
-void clearOneCounter(int which)
-{
-  clearCounters();
-  /*
-  switch(which)
-  {
-    case 0:
-      clearCounters();
-      break;
-
-    case 1:
-      leftTicks=0;
-      break;
-
-    case 2:
-      rightTicks=0;
-      break;
-
-    case 3:
-      leftRevs=0;
-      break;
-
-    case 4:
-      rightRevs=0;
-      break;
-
-    case 5:
-      forwardDist=0;
-      break;
-
-    case 6:
-      reverseDist=0;
-      break;
-  }
-  */
-}
-// Intialize Vincet's internal states
-
+// Intialize Alex's internal states
 void initializeState()
 {
   clearCounters();
@@ -710,7 +659,7 @@ void handleCommand(TPacket *command)
 
     case COMMAND_CLEAR_STATS:
       sendOK();
-      clearOneCounter(command->params[0]);
+      initializeState();
       break;
 
     case COMMAND_GET_COLOR:
