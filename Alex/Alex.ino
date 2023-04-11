@@ -4,6 +4,8 @@
 #include "packet.h"
 #include "constants.h"
 
+#include "Arduino.h"
+
 typedef enum {
   STOP=0,
   FORWARD=1,
@@ -382,6 +384,21 @@ void setupMotors()
    *    B1IN - Pin 10, PB2, OC1B
    *    B2In - pIN 11, PB3, OC2A
    */
+  TCNT0 = 0;
+  TCNT1 = 0;
+  TCNT2 = 0;
+
+  OCR0A = 0;
+  OCR0B = 0;
+  OCR2A = 0;
+  OCR1B = 0;
+
+  TCCR0A = 0b1;
+  TCCR1A = 0b1;
+  TCCR2A = 0b1;
+
+  DDRB |= 0b00001100;
+  DDRD |= 0b01100000;
 }
 
 // Start the PWM for Alex's motors.
@@ -389,7 +406,9 @@ void setupMotors()
 // blank.
 void startMotors()
 {
-  
+  TCCR0B = 0b11;
+  TCCR1B = 0b11;
+  TCCR2B = 0b11;
 }
 
 void setupColor() {
@@ -481,7 +500,7 @@ void sendColor()
 }
 
 // Convert percentages to PWM values
-int pwmVal(float speed)
+void pwmVal(float speed)
 {
   if (speed < 0.0)
     speed = 0;
@@ -489,7 +508,12 @@ int pwmVal(float speed)
   else if (speed > 100.0)
     speed = 100.0;
 
-  return (int) ((speed / 100.0) * 255.0);
+  int val = (int) ((speed / 100.0) * 255.0);
+
+  OCR0A = val;
+  OCR0B = val;
+  OCR1B = val;
+  OCR2A = val;
 }
 
 // Move Alex forward "dist" cm at speed "speed".
@@ -509,7 +533,7 @@ void forward(float dist, float speed)
 
   dir = FORWARD;
 
-  int val = pwmVal(speed);
+  pwmVal(speed);
 
   // For now we will ignore dist and move
   // forward indefinitely. We will fix this
@@ -519,10 +543,9 @@ void forward(float dist, float speed)
   // RF = Right forward pin, RR = Right reverse pin
   // This will be replaced later with bare-metal code.
   
-  analogWrite(LF, val);
-  analogWrite(RF, (int)(val*0.95));
-  analogWrite(LR,0);
-  analogWrite(RR, 0);
+  TCCR0A = 0b00100001;
+  TCCR1A = 0b00000001;
+  TCCR2A = 0b10000001;
 }
 
 // Reverse Alex "dist" cm at speed "speed".
@@ -542,7 +565,7 @@ void reverse(float dist, float speed)
 
   dir = BACKWARD;
 
-  int val = pwmVal(speed);
+  pwmVal(speed);
 
   // For now we will ignore dist and 
   // reverse indefinitely. We will fix this
@@ -551,10 +574,9 @@ void reverse(float dist, float speed)
   // LF = Left forward pin, LR = Left reverse pin
   // RF = Right forward pin, RR = Right reverse pin
   // This will be replaced later with bare-metal code.
-  analogWrite(LR, val);
-  analogWrite(RR, val*0.95);
-  analogWrite(LF, 0);
-  analogWrite(RF, 0);
+  TCCR0A = 0b10000001;
+  TCCR1A = 0b00100001;
+  TCCR2A = 0b00000001;
 }
 
 // New function to estimate number of wheel ticks
@@ -589,16 +611,15 @@ void left(float ang, float speed)
 
   dir = RIGHT;
 
-  int val = pwmVal(speed);
+  pwmVal(speed);
 
   // For now we will ignore ang. We will fix this in Week 9.
   // We will also replace this code with bare-metal later.
   // To turn right we reverse the right wheel and move
   // the left wheel forward.
-  analogWrite(RR, val*0.95);
-  analogWrite(LF, val);
-  analogWrite(LR, 0);
-  analogWrite(RF, 0);
+  TCCR0A = 0b00100001;
+  TCCR1A = 0b00100001;
+  TCCR2A = 0b00000001;
 }
 
 // Turn Alex right "ang" degrees at speed "speed".
@@ -618,16 +639,15 @@ void right(float ang, float speed)
 
   dir = LEFT;
 
-  int val = pwmVal(speed);
+  pwmVal(speed);
 
   // For now we will ignore ang. We will fix this in Week 9.
   // We will also replace this code with bare-metal later.
   // To turn left we reverse the left wheel and move
   // the right wheel forward.
-  analogWrite(LR, val);
-  analogWrite(RF, val*0.95);
-  analogWrite(LF, 0);
-  analogWrite(RR, 0);
+  TCCR0A = 0b10000001;
+  TCCR1A = 0b00000001;
+  TCCR2A = 0b10000001;
 }
 
 // Stop Alex. To replace with bare-metal code later.
@@ -635,10 +655,9 @@ void stop()
 {
   dir = STOP;
 
-  analogWrite(LF, 0);
-  analogWrite(LR, 0);
-  analogWrite(RF, 0);
-  analogWrite(RR, 0);
+  TCCR0A = 0b1;
+  TCCR1A = 0b1;
+  TCCR2A = 0b1;
 }
 
 /*
