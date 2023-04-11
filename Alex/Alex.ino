@@ -58,9 +58,6 @@ const float alexCirc = PI * alexDiagonal;
 #define trig 12 
 #define echo 13
 
-int redColor =0;        
-int blueColor =0; 
-int greenColor =0; 
 int color[3] = {0,0,0};
 float distance;
 float soundSpeed = 0.0345;
@@ -399,26 +396,23 @@ void distance_check() {
   digitalWrite(trig, LOW);
   delayMicroseconds(2);
   distance = pulseIn(echo, HIGH);
-  distance = distance*soundSpeed/2;
+  distance *= soundSpeed / 2;
 }
 
 void color_check() {
   digitalWrite(s2,LOW); 
   digitalWrite(s3,LOW);
-  redColor =pulseIn(out,LOW);
-  color[0] = redColor;
+  color[0] = pulseIn(out,LOW);
   delay(20);
                     
   digitalWrite(s2,LOW);
   digitalWrite(s3,HIGH);
-  blueColor=pulseIn(out,LOW);
-  color[1] = blueColor;
+  color[1] = pulseIn(out,LOW);
   delay(20);
 
   digitalWrite(s2,HIGH);
   digitalWrite(s3,HIGH);
-  greenColor = pulseIn(out,LOW);
-  color[2] = greenColor;
+  color[2] = pulseIn(out,LOW);
   delay(20);
 
   delay(200);  
@@ -426,27 +420,13 @@ void color_check() {
 
 void sendColor()
 {
-  // Implement code to send back a packet containing key
-  // information like leftTicks, rightTicks, leftRevs, rightRevs
-  // forwardDist and reverseDist
-  // Use the params array to store this information, and set the
-  // packetType and command files accordingly, then use sendResponse
-  // to send out the packet. See sendMessage on how to use sendResponse.
-  
-  // TPacket colorPacket;
-  // colorPacket.packetType = PACKET_TYPE_MESSAGE;
-  // colorPacket.command = RESP_STATUS;
-
-  // colorPacket.params[0] = color;
-  
-  // sendResponse(&colorPacket);
-
   TPacket colorPacket;
-  colorPacket.packetType = PACKET_TYPE_COLOR;
+  colorPacket.packetType = PACKET_TYPE_RESPONSE;
   colorPacket.command = RESP_COLOR;
 
   for (int i=0; i<3; i++)
-    colorPacket.params[i] = color[i];
+    colorPacket.params[i] = (unsigned long)color[i];
+  colorPacket.params[3] = (unsigned long)distance;
   
   sendResponse(&colorPacket);
 }
@@ -682,6 +662,7 @@ void handleCommand(TPacket *command)
 
     case COMMAND_GET_COLOR:
       color_check();
+      distance_check();
       sendColor();
       break;
         

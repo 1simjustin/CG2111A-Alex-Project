@@ -86,6 +86,6 @@ void distance_check(){
    distance = pulseIn(echo, HIGH);
    distance = distance*soundSpeed/2;
    Serial.print("Distance = "); 
-   Serial.print(distance);
+   Serial.print((int)distance);
    Serial.println();
 }
