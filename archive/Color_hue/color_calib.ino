@@ -65,18 +65,18 @@ void sendColour() {
 
 /*Calculates the color hue of detected color*/
 float calchue(float red, float green, float blue) {
-    float color_array[3]= {red, green, blue};
-    float R = color_array[0] / 255;
-    float G = color_array[1] / 255;
-    float B = color_array[2] / 255;
+    float color[3]= {red, green, blue};
+    float R = color[0] / 255;
+    float G = color[1] / 255;
+    float B = color[2] / 255;
     float max = R;
     float min = R;
     for (int i = 0; i <= 2; i += 1) {
-    if (max < color_array[i] / 255) {
-        max = color_array[i] / 255;
+    if (max < color[i] / 255) {
+        max = color[i] / 255;
     }
-    if (min > color_array[i] / 255) {
-        min = color_array[i] / 255;
+    if (min > color[i] / 255) {
+        min = color[i] / 255;
     }
     }
     /*Returns calculated color hue according to formula in section x of report*/
