@@ -61,7 +61,7 @@ const float alexCirc = PI * alexDiagonal;
 int redColor =0;        
 int blueColor =0; 
 int greenColor =0; 
-int color;
+int color[3] = {0,0,0};
 float distance;
 float soundSpeed = 0.0345;
 
@@ -406,26 +406,20 @@ void color_check() {
   digitalWrite(s2,LOW); 
   digitalWrite(s3,LOW);
   redColor =pulseIn(out,LOW);
+  color[0] = redColor;
   delay(20);
                     
   digitalWrite(s2,LOW);
   digitalWrite(s3,HIGH);
   blueColor=pulseIn(out,LOW);
+  color[1] = blueColor;
   delay(20);
 
   digitalWrite(s2,HIGH);
   digitalWrite(s3,HIGH);
   greenColor = pulseIn(out,LOW);
+  color[2] = greenColor;
   delay(20);
-  
-  if (redColor > 57 && redColor < 73 &&  greenColor > 109 && greenColor < 126 )
-    color = 1;
-  
-  else if (redColor > 91 && redColor < 109  && greenColor > 77 && greenColor < 95)
-    color = 2;
-  
-  else 
-    color = 0; 
 
   delay(200);  
 }
@@ -439,11 +433,20 @@ void sendColor()
   // packetType and command files accordingly, then use sendResponse
   // to send out the packet. See sendMessage on how to use sendResponse.
   
-  TPacket colorPacket;
-  colorPacket.packetType = PACKET_TYPE_MESSAGE;
-  colorPacket.command = RESP_STATUS;
+  // TPacket colorPacket;
+  // colorPacket.packetType = PACKET_TYPE_MESSAGE;
+  // colorPacket.command = RESP_STATUS;
 
-  colorPacket.params[0] = color;
+  // colorPacket.params[0] = color;
+  
+  // sendResponse(&colorPacket);
+
+  TPacket colorPacket;
+  colorPacket.packetType = PACKET_TYPE_COLOR;
+  colorPacket.command = RESP_COLOR;
+
+  for (int i=0; i<3; i++)
+    colorPacket.params[i] = color[i];
   
   sendResponse(&colorPacket);
 }

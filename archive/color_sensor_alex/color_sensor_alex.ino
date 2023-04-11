@@ -43,26 +43,26 @@ void loop()                  //Every 0.2s we select a photodiodes set and read i
 void color_check(){
 digitalWrite(s2,LOW);        //S2/S3 levels define which set of photodiodes we are using LOW/LOW is for RED LOW/HIGH is for Blue and HIGH/HIGH is for green
    digitalWrite(s3,LOW);
-//   Serial.print("Red value= "); 
+   Serial.print("Red value= "); 
    redColor =pulseIn(out,LOW);  //here we wait until "out" go LOW, we start measuring the duration      and stops when "out" is HIGH again
-//   Serial.print(redColor);     
-//   Serial.print("\t");          
+   Serial.print(redColor);     
+   Serial.print("\t");          
    delay(20);
                       
    digitalWrite(s2,LOW);
    digitalWrite(s3,HIGH);
-//   Serial.print("Blue value= ");
+   Serial.print("Blue value= ");
    blueColor=pulseIn(out,LOW);  //here we wait until "out" go LOW, we start measuring the duration and stops when "out" is HIGH again
-//   Serial.print(blueColor);       
-//   Serial.print("\t");          
+   Serial.print(blueColor);       
+   Serial.print("\t");          
    delay(20);
 
    digitalWrite(s2,HIGH);
    digitalWrite(s3,HIGH);
-//   Serial.print("Green value= ");
+   Serial.print("Green value= ");
    greenColor = pulseIn(out,LOW);  //here we wait until "out" go LOW, we start measuring the duration and stops when "out" is HIGH again
-//   Serial.print(greenColor);    
-//   Serial.print("\t");          
+   Serial.print(greenColor);    
+   Serial.print("\t");          
    delay(20);
    
    if(redColor > 57 && redColor < 73 &&  greenColor > 109 && greenColor < 126 ){
