@@ -40,6 +40,7 @@ void forward(float dist, float speed);
 void reverse(float dist, float speed);
 void left(float angle, float speed);
 void right(float angle, float speed);
+void clearCounters();
 
 // PI, for calculating turn circumference
 #define PI                  3.141592654
@@ -413,6 +414,7 @@ void distance_check() {
 }
 
 void moveObject() {
+  clearCounters();
   const float threshold = 7.0;
   const float k = 60; // expected speed at 1cm
   const float range = 0.1;
@@ -422,17 +424,19 @@ void moveObject() {
   while (distance < (threshold - range) || distance > (threshold + range)) {
     if (distance < (threshold - range)) {
       speed = (distance - threshold) * k;
-      forward(0, speed);
+      forward(0.1, speed);
     }
     else if (distance > (threshold + range)) {
       speed = (threshold - distance) * k;
-      reverse(0, speed);
+      reverse(0.1, speed);
     }
     else
       stop();
+      
+    delayMicroseconds(100);
     distance_check();
+    clearCounters();
   }
-  clearCounters();
 }
 
 void color_check() {
@@ -714,8 +718,8 @@ void handleCommand(TPacket *command)
       break;
 
     case COMMAND_GET_COLOR:
+      moveObject();
       color_check();
-      distance_check();
       sendColor();
       break;
         
