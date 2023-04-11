@@ -682,12 +682,6 @@ void clearCounters()
   reverseDist=0; 
 }
 
-// Intialize Alex's internal states
-void initializeState()
-{
-  clearCounters();
-}
-
 void handleCommand(TPacket *command)
 {
   switch(command->command)
@@ -696,6 +690,7 @@ void handleCommand(TPacket *command)
     case COMMAND_STOP:
       sendOK();
       stop();
+      clearCounters();
       break;
 
     // For movement commands, param[0] = distance, param[1] = speed.
@@ -725,7 +720,7 @@ void handleCommand(TPacket *command)
 
     case COMMAND_CLEAR_STATS:
       sendOK();
-      initializeState();
+      clearCounters();
       break;
 
     case COMMAND_GET_COLOR:
@@ -786,7 +781,7 @@ void setup() {
   setupMotors();
   startMotors();
   enablePullups();
-  initializeState();
+  clearCounters();
   sei();
   setupColor();
 }
