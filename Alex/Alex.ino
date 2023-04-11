@@ -426,13 +426,34 @@ void color_check() {
   delay(200);  
 }
 
+int calchue(int color[3]) {
+  float max = color[0];
+  float min = color[0];
+
+  for (int i = 0; i < 3; i++) {
+    if (max < color[i])
+      max = color[i];
+    if (min > color[i])
+      min = color[i];
+  }
+
+  if (max == color[0])
+    return (color[2] - color[1]) / (max - min);
+  else if (max == color[1])
+    return 4.0 + (color[0] - color[2]) / (max - min);
+  else if (max == color[2])
+    return 2.0 + (color[1] - color[0]) / (max - min);
+}
+
 void sendColor()
 {
+  int hue = calchue(color);
   char colorNumStr[7];
   for (int i = 0; i < 3; i++) {
     sendMessage(itoa(color[i], colorNumStr, 10));
   }
   sendMessage(itoa(distance, colorNumStr, 10));
+  sendMessage(itoa(hue, colorNumStr, 10));
 }
 
 // Convert percentages to PWM values
