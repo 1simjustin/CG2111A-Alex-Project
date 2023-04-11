@@ -62,6 +62,14 @@ int color[3] = {0,0,0};
 float distance;
 float soundSpeed = 0.0345;
 
+int redFrequency = 0;
+int greenFrequency = 0;
+int blueFrequency = 0;
+
+float redColour = 0;
+float greenColour = 0;
+float blueColour = 0;
+
 /*
  *    Alex's State Variables
  */
@@ -402,17 +410,17 @@ void distance_check() {
 void color_check() {
   digitalWrite(s2,LOW); 
   digitalWrite(s3,LOW);
-  color[0] = pulseIn(out,LOW);
+  color[0] = map(pulseIn(out,LOW), 400, 1500, 255, 0);
   delay(20);
                     
   digitalWrite(s2,LOW);
   digitalWrite(s3,HIGH);
-  color[1] = pulseIn(out,LOW);
+  color[1] = map(pulseIn(out,LOW), 415, 2400, 255, 0);
   delay(20);
 
   digitalWrite(s2,HIGH);
   digitalWrite(s3,HIGH);
-  color[2] = pulseIn(out,LOW);
+  color[2] = map(pulseIn(out,LOW), 200, 1260, 255, 0);
   delay(20);
 
   delay(200);  
@@ -720,6 +728,7 @@ void setup() {
   enablePullups();
   initializeState();
   sei();
+  setupColor();
 }
 
 void handlePacket(TPacket *packet)
