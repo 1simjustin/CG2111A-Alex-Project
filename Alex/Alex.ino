@@ -454,10 +454,10 @@ void sendColor()
 // Convert percentages to PWM values
 int pwmVal(float speed)
 {
-  if(speed < 0.0)
+  if (speed < 0.0)
     speed = 0;
 
-  if(speed > 100.0)
+  else if (speed > 100.0)
     speed = 100.0;
 
   return (int) ((speed / 100.0) * 255.0);
