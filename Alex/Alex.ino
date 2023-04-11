@@ -50,17 +50,20 @@ const float alexDiagonal = sqrt((ALEX_LENGTH * ALEX_LENGTH) + (ALEX_BREADTH * AL
 const float alexCirc = PI * alexDiagonal;
 
 // Colour Init
-#define s0 A0
+#define s0 A0       
 #define s1 A1
 #define out A2
 #define s2 A3
 #define s3 A4
+#define trig 12 
+#define echo 13
 
-int redColor = 0;
-int blueColor = 0;
-int greenColor = 0;
-int data = 0;
-int color = 0;
+int redColor =0;        
+int blueColor =0; 
+int greenColor =0; 
+int color;
+float distance;
+float soundSpeed = 0.0345;
 
 /*
  *    Alex's State Variables
@@ -379,44 +382,53 @@ void startMotors()
 }
 
 void setupColor() {
-  pinMode(s0, OUTPUT);
-  pinMode(s1, OUTPUT);
-  pinMode(s2, OUTPUT);
-  pinMode(s3, OUTPUT);
-  pinMode(out, INPUT);
+  pinMode(s0,OUTPUT);   
+  pinMode(s1,OUTPUT);
+  pinMode(s2,OUTPUT);
+  pinMode(s3,OUTPUT);
+  pinMode(out,INPUT);
+  pinMode(trig, OUTPUT);
+  pinMode(echo, INPUT);
+  digitalWrite(s0,HIGH);
+  digitalWrite(s1,HIGH);
+}
 
-  digitalWrite(s0, HIGH);
-  digitalWrite(s1, HIGH);
+void distance_check() {
+  digitalWrite(trig, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trig, LOW);
+  delayMicroseconds(2);
+  distance = pulseIn(echo, HIGH);
+  distance = distance*soundSpeed/2;
 }
 
 void color_check() {
-  digitalWrite(s2, LOW);       //S2/S3 levels define which set of photodiodes we are using LOW/LOW is for RED LOW/HIGH is for Blue and HIGH/HIGH is for green
-  digitalWrite(s3, LOW);
-  redColor = pulseIn(out, LOW); //here we wait until "out" go LOW, we start measuring the duration      and stops when "out" is HIGH again
+  digitalWrite(s2,LOW); 
+  digitalWrite(s3,LOW);
+  redColor =pulseIn(out,LOW);
+  delay(20);
+                    
+  digitalWrite(s2,LOW);
+  digitalWrite(s3,HIGH);
+  blueColor=pulseIn(out,LOW);
   delay(20);
 
-  digitalWrite(s2, LOW);
-  digitalWrite(s3, HIGH);
-  blueColor = pulseIn(out, LOW); //here we wait until "out" go LOW, we start measuring the duration and stops when "out" is HIGH again
+  digitalWrite(s2,HIGH);
+  digitalWrite(s3,HIGH);
+  greenColor = pulseIn(out,LOW);
   delay(20);
-
-  digitalWrite(s2, HIGH);
-  digitalWrite(s3, HIGH);
-  greenColor = pulseIn(out, LOW); //here we wait until "out" go LOW, we start measuring the duration and stops when "out" is HIGH again
-  delay(20);
-
-
-  if (redColor > 29 && redColor < 63 && blueColor > 39 && blueColor < 70 && greenColor > 57 && greenColor < 98 ) {
-    color = 1;
-  } else if (redColor > 47 && redColor < 77 && blueColor > 37 && blueColor < 67 && greenColor > 40 && greenColor < 70) {
-    color = 2;
-  } else if (redColor > 21 && redColor < 60 && blueColor > 14 && blueColor < 60 && greenColor > 17 && greenColor < 60) {
-    color = 3;
-  } else {
-    color = 0;
+  
+  if (redColor > 57 && redColor < 73 &&  greenColor > 109 && greenColor < 126 ) {
+  color = 1;
+  }
+  else if (redColor > 91 && redColor < 109  && greenColor > 77 && greenColor < 95) {
+  color = 2;
+  }
+  else {
+  color = 0; 
   }
 
-  delay(200);
+  delay(200);  
 }
 
 void sendColor()
