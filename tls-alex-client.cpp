@@ -1,9 +1,9 @@
 
 // Routines to create a TLS client
-#include "make_tls_client.h"
+#include "headers/make_tls_client.h"
 
 // Network packet types
-#include "netconstants.h"
+#include "headers/netconstants.h"
 
 // Packet types, error codes, etc.
 #include "Alex/constants.h"
@@ -105,7 +105,7 @@ void sendData(void *conn, const char *buffer, int len)
 		/* TODO: Insert SSL write here to write buffer to network */
 
 		// int sslWrite(void *conn, const char *buffer, int len);
-		sslWrite(conn, buffer, len);
+		c = sslWrite(conn, buffer, sizeof(buffer));
 
 		/* END TODO */	
 		networkActive = (c > 0);
@@ -122,7 +122,7 @@ void *readerThread(void *conn)
 		/* TODO: Insert SSL read here into buffer */
 
         // int sslRead(void *conn, char *buffer, int len);
-		sslRead(conn, buffer, 128);
+		len = sslRead(conn, buffer, sizeof(buffer));
 		printf("read %d bytes from server.\n", len);
 		
 		/* END TODO */
@@ -164,7 +164,7 @@ void *writerThread(void *conn)
 	while(!quit)
 	{
 		char ch;
-		printf("Command (f=forward, b=reverse, l=turn left, r=turn right, s=stop, c=clear stats, g=get stats, i= get color, q=exit)\n");
+		printf("Command (w=forward, s=reverse, a=left, d=right, e=stop, c=clear stats, g=get stats, i= get color, q=exit)\n");
 		scanf("%c", &ch);
 
 		// Purge extraneous characters from input stream
@@ -176,33 +176,47 @@ void *writerThread(void *conn)
 		buffer[0] = NET_COMMAND_PACKET;
 		switch(ch)
 		{
-			case 'f':
-			case 'F':
-			case 'b':
-			case 'B':
-			case 'l':
-			case 'L':
-			case 'r':
-			case 'R':
-						getParams(params);
-						buffer[1] = ch;
-						memcpy(&buffer[2], params, sizeof(params));
-						sendData(conn, buffer, sizeof(buffer));
-						break;
+			case 'w':
+			case 'a':
 			case 's':
+			case 'd':
+				getParams(params);
+				buffer[1] = ch;
+				memcpy(&buffer[2], params, sizeof(params));
+				sendData(conn, buffer, sizeof(buffer));
+				break;
+
+			case 'W':
 			case 'S':
+				params[0] = 5;
+				params[1] = 80;
+				buffer[1] = ch;
+				memcpy(&buffer[2], params, sizeof(params));
+				sendData(conn, buffer, sizeof(buffer));
+				break;
+			case 'A':
+			case 'D':
+				params[0] = 10;
+				params[1] = 80;
+				buffer[1] = ch;
+				memcpy(&buffer[2], params, sizeof(params));
+				sendData(conn, buffer, sizeof(buffer));
+				break;
+
+			case 'e': // e to stop
+			case 'E':
 			case 'c':
 			case 'C':
 			case 'g':
 			case 'G':
 			case 'i':
 			case 'I':
-					params[0]=0;
-					params[1]=0;
-					memcpy(&buffer[2], params, sizeof(params));
-					buffer[1] = ch;
-					sendData(conn, buffer, sizeof(buffer));
-					break;
+				params[0] = 0;
+				params[1] = 0;
+				memcpy(&buffer[2], params, sizeof(params));
+				buffer[1] = ch;
+				sendData(conn, buffer, sizeof(buffer));
+				break;
 			case 'q':
 			case 'Q':
 				quit=1;
@@ -224,13 +238,12 @@ void *writerThread(void *conn)
 /* TODO: #define filenames for the client private key, certificatea,
    CA filename, etc. that you need to create a client */
 
-#define clientPrivateKey		"laptop.key"
-#define clientCertFname			"laptop.crt"
-#define caCertFname				"signing.pem"
-
-// #define serverIP				"172.20.10.11"
-// #define portNum				5000
- #define serverNameOnCert		"alex.epp.com"
+#define SERVER_NAME 			"172.20.10.11"
+#define CA_CERT_FNAME 			"network/signing.pem"
+#define PORT_NUM 				5000
+#define CLIENT_CERT_FNAME 		"network/laptop.crt"
+#define CLIENT_KEY_FNAME 		"network/laptop.key"
+#define SERVER_NAME_ON_CERT 	"alex.epp.com"
 
 /* END TODO */
 void connectToServer(const char *serverName, int portNum)
@@ -238,7 +251,7 @@ void connectToServer(const char *serverName, int portNum)
     /* TODO: Create a new client */
 
 	// void createClient(const char *serverName, const int serverPort, int verifyServer, const char *caCertFname, const char *serverNameOnCert, int sendCert, const char *clientCertFname, const char *clientPrivateKey, void *(*readerThread)(void *), void *(*writerThread)(void *));
-	createClient(serverName, portNum, 1, caCertFname, serverNameOnCert, 1, clientCertFname, clientPrivateKey, readerThread, writerThread);
+	createClient(SERVER_NAME, PORT_NUM, 1, CA_CERT_FNAME, SERVER_NAME_ON_CERT, 1, CLIENT_CERT_FNAME, CLIENT_KEY_FNAME, readerThread, writerThread);
 
     /* END TODO */
 }
