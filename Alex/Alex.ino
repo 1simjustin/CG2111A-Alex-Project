@@ -416,27 +416,21 @@ void distance_check() {
 void moveObject() {
   clearCounters();
   const float threshold = 7.0;
-  const float k = 60; // expected speed at 1cm
   const float range = 0.1;
-  int speed = 60;
+  const int speed = 60;
 
   distance_check();
-  while (distance < (threshold - range) || distance > (threshold + range)) {
-    if (distance < (threshold - range)) {
-      speed = (distance - threshold) * k;
-      forward(0.1, speed);
-    }
-    else if (distance > (threshold + range)) {
-      speed = (threshold - distance) * k;
-      reverse(0.1, speed);
-    }
-    else
-      stop();
-      
-    delayMicroseconds(100);
-    distance_check();
-    clearCounters();
+
+  if (distance > (threshold + range)) {
+    forward(distance - threshold, speed);
   }
+  else if (distance < (threshold - range)) {
+    reverse(threshold - distance, speed);
+  }
+  else
+    stop();
+
+  clearCounters();
 }
 
 void color_check() {
@@ -528,7 +522,7 @@ void forward(float dist, float speed)
   // This will be replaced later with bare-metal code.
   
   analogWrite(LF, val);
-  analogWrite(RF, (int)(val*0.98));
+  analogWrite(RF, (int)(val*0.95));
   analogWrite(LR,0);
   analogWrite(RR, 0);
 }
@@ -560,7 +554,7 @@ void reverse(float dist, float speed)
   // RF = Right forward pin, RR = Right reverse pin
   // This will be replaced later with bare-metal code.
   analogWrite(LR, val);
-  analogWrite(RR, val*0.98);
+  analogWrite(RR, val*0.95);
   analogWrite(LF, 0);
   analogWrite(RF, 0);
 }
@@ -603,7 +597,7 @@ void left(float ang, float speed)
   // We will also replace this code with bare-metal later.
   // To turn right we reverse the right wheel and move
   // the left wheel forward.
-  analogWrite(RR, val*0.98);
+  analogWrite(RR, val*0.95);
   analogWrite(LF, val);
   analogWrite(LR, 0);
   analogWrite(RF, 0);
@@ -633,7 +627,7 @@ void right(float ang, float speed)
   // To turn left we reverse the left wheel and move
   // the right wheel forward.
   analogWrite(LR, val);
-  analogWrite(RF, val*0.98);
+  analogWrite(RF, val*0.95);
   analogWrite(LF, 0);
   analogWrite(RR, 0);
 }
