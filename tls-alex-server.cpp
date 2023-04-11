@@ -81,6 +81,11 @@ void handleColor(TPacket *packet)
 	printf("UART COLOR PACKET\n");
 	data[0] = NET_COLOR_PACKET;
 	memcpy(&data[1], packet->params, sizeof(packet->params));
+	for (int i=1;i<5;i++) {
+		printf("%d\t",packet->params[i-1]);
+		//data[i] = packet->params[i-1];
+		printf("%d\t", data[i]);
+	}
 	sendNetworkData(data, sizeof(data));
 }
 
@@ -105,7 +110,6 @@ void handleResponse(TPacket *packet)
 			handleColor(packet);
 		break;
 
-
 		default:
 		printf("Boo\n");
 	}
@@ -117,20 +121,20 @@ void handleUARTPacket(TPacket *packet)
 	switch(packet->packetType)
 	{
 		case PACKET_TYPE_COMMAND:
-				// Only we send command packets, so ignore
-			break;
+			// Only we send command packets, so ignore
+		break;
 
 		case PACKET_TYPE_RESPONSE:
-				handleResponse(packet);
-			break;
+			handleResponse(packet);
+		break;
 
 		case PACKET_TYPE_ERROR:
-				handleErrorResponse(packet);
-			break;
+			handleErrorResponse(packet);
+		break;
 
 		case PACKET_TYPE_MESSAGE:
-				handleMessage(packet);
-			break;
+			handleMessage(packet);
+		break;
 	}
 }
 
