@@ -410,17 +410,17 @@ void distance_check() {
 void color_check() {
   digitalWrite(s2,LOW); 
   digitalWrite(s3,LOW);
-  color[0] = map(pulseIn(out,LOW), 400, 1500, 255, 0);
+  color[0] = pulseIn(out,LOW);
   delay(20);
                     
   digitalWrite(s2,LOW);
   digitalWrite(s3,HIGH);
-  color[1] = map(pulseIn(out,LOW), 415, 2400, 255, 0);
+  color[1] = pulseIn(out,LOW);
   delay(20);
 
   digitalWrite(s2,HIGH);
   digitalWrite(s3,HIGH);
-  color[2] = map(pulseIn(out,LOW), 200, 1260, 255, 0);
+  color[2] = pulseIn(out,LOW);
   delay(20);
 
   delay(200);  
@@ -428,15 +428,11 @@ void color_check() {
 
 void sendColor()
 {
-  TPacket colorPacket;
-  colorPacket.packetType = PACKET_TYPE_RESPONSE;
-  colorPacket.command = RESP_COLOR;
-
-  for (int i=0; i<3; i++)
-    colorPacket.params[i] = (unsigned long)color[i];
-  colorPacket.params[3] = (unsigned long)distance;
-  
-  sendResponse(&colorPacket);
+  char colorNumStr[7];
+  for (int i = 0; i < 3; i++) {
+    sendMessage(itoa(color[i], colorNumStr, 10));
+  }
+  sendMessage(itoa(distance, colorNumStr, 10));
 }
 
 // Convert percentages to PWM values
