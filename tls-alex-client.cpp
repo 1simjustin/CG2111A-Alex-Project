@@ -189,15 +189,15 @@ void *writerThread(void *conn)
 			case 'W':
 			case 'S':
 				params[0] = 5;
-				params[1] = 70;
+				params[1] = 60;
 				buffer[1] = ch;
 				memcpy(&buffer[2], params, sizeof(params));
 				sendData(conn, buffer, sizeof(buffer));
 				break;
 			case 'A':
 			case 'D':
-				params[0] = 20;
-				params[1] = 70;
+				params[0] = 15;
+				params[1] = 60;
 				buffer[1] = ch;
 				memcpy(&buffer[2], params, sizeof(params));
 				sendData(conn, buffer, sizeof(buffer));
