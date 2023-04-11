@@ -1,10 +1,10 @@
-#include "make_tls_server.h"
-#include "tls_common_lib.h"
-#include "netconstants.h"
+#include "headers/make_tls_server.h"
+#include "headers/tls_common_lib.h"
+#include "headers/netconstants.h"
 #include "Alex/constants.h"
 #include "Alex/packet.h"
-#include "serial.h"
-#include "serialize.h"
+#include "headers/serial.h"
+#include "headers/serialize.h"
 
 /* TODO: Set PORT_NAME to the port name of your Arduino */
 #define PORT_NAME			"/dev/ttyACM0"
@@ -13,15 +13,15 @@
 #define BAUD_RATE			B9600
 
 // TLS Port Number
-#define SERVER_PORT			5000
+#define PORTNUM				5000
 
 /* TODO: #define constants for the  filenames for Alex's private key, certificate, CA certificate name,
         and the Common Name for your laptop */
 
-#define keyFilename			"alex.key"
-#define certFilename		"alex.crt"
-#define caCertFilename		"signing.pem"
-#define peerName			"laptop.epp.com"
+#define KEY_FNAME			"network/alex.key"
+#define CERT_FNAME			"network/alex.crt"
+#define CA_CERT_FNAME		"network/signing.pem"
+#define CLIENT_NAME			"network/laptop.epp.com"
 
 /* END TODO */
 
@@ -200,7 +200,7 @@ void sendNetworkData(const char *data, int len)
               connection we want to write to. */
 
 			// int sslWrite(void *conn, const char *buffer, int len);
-			sslWrite(tls_conn, data, len);
+			c = sslWrite(tls_conn, data, sizeof(data));
 
             /* END TODO */
 
@@ -230,32 +230,32 @@ void handleCommand(void *conn, const char *buffer)
 	
 	switch(cmd)
 	{
-		case 'f':
-		case 'F':
+		case 'w':
+		case 'W':
 			commandPacket.command = COMMAND_FORWARD;
-			uartSendPacket(&commandPacket);
-			break;
-
-		case 'b':
-		case 'B':
-			commandPacket.command = COMMAND_REVERSE;
-			uartSendPacket(&commandPacket);
-			break;
-
-		case 'l':
-		case 'L':
-			commandPacket.command = COMMAND_TURN_LEFT;
-			uartSendPacket(&commandPacket);
-			break;
-
-		case 'r':
-		case 'R':
-			commandPacket.command = COMMAND_TURN_RIGHT;
 			uartSendPacket(&commandPacket);
 			break;
 
 		case 's':
 		case 'S':
+			commandPacket.command = COMMAND_REVERSE;
+			uartSendPacket(&commandPacket);
+			break;
+
+		case 'a':
+		case 'A':
+			commandPacket.command = COMMAND_TURN_LEFT;
+			uartSendPacket(&commandPacket);
+			break;
+
+		case 'd':
+		case 'D':
+			commandPacket.command = COMMAND_TURN_RIGHT;
+			uartSendPacket(&commandPacket);
+			break;
+
+		case 'e':
+		case 'E':
 			commandPacket.command = COMMAND_STOP;
 			uartSendPacket(&commandPacket);
 			break;
@@ -281,7 +281,6 @@ void handleCommand(void *conn, const char *buffer)
 
 		default:
 			printf("Bad command\n");
-
 	}
 }
 
@@ -311,7 +310,7 @@ void *worker(void *conn)
 		/* TODO: Implement SSL read into buffer */
 
 		// int sslRead(void *conn, char *buffer, int len);
-		sslRead(conn, buffer, BUF_LEN);
+		len = sslRead(conn, buffer, sizeof(buffer));
 
 		/* END TODO */
 		// As long as we are getting data, network is active
@@ -365,7 +364,7 @@ int main()
         Alex's certificate. Use the #define names you defined earlier  */
 
 	// void createServer(const char *keyFilename, const char *certFilename, int portNum, void *(*workerThread)(void *), const char *caCertFilename, const char *peerName, int verifyPeer);
-	createServer(keyFilename, certFilename, SERVER_PORT, &worker, caCertFilename, peerName, 1);
+	createServer(KEY_FNAME, CERT_FNAME, PORTNUM, &worker, CA_CERT_FNAME, CLIENT_NAME, 1);
 
     /* TODO END */
 
