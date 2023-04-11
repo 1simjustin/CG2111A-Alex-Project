@@ -21,7 +21,7 @@
 #define KEY_FNAME			"network/alex.key"
 #define CERT_FNAME			"network/alex.crt"
 #define CA_CERT_FNAME		"network/signing.pem"
-#define CLIENT_NAME			"network/laptop.epp.com"
+#define CLIENT_NAME			"laptop.epp.com"
 
 /* END TODO */
 

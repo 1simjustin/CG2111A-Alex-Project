@@ -418,15 +418,14 @@ void color_check() {
   greenColor = pulseIn(out,LOW);
   delay(20);
   
-  if (redColor > 57 && redColor < 73 &&  greenColor > 109 && greenColor < 126 ) {
-  color = 1;
-  }
-  else if (redColor > 91 && redColor < 109  && greenColor > 77 && greenColor < 95) {
-  color = 2;
-  }
-  else {
-  color = 0; 
-  }
+  if (redColor > 57 && redColor < 73 &&  greenColor > 109 && greenColor < 126 )
+    color = 1;
+  
+  else if (redColor > 91 && redColor < 109  && greenColor > 77 && greenColor < 95)
+    color = 2;
+  
+  else 
+    color = 0; 
 
   delay(200);  
 }
@@ -489,7 +488,7 @@ void forward(float dist, float speed)
   // This will be replaced later with bare-metal code.
   
   analogWrite(LF, val);
-  analogWrite(RF, val*0.9);
+  analogWrite(RF, (int)(val*0.98));
   analogWrite(LR,0);
   analogWrite(RR, 0);
 }
@@ -521,7 +520,7 @@ void reverse(float dist, float speed)
   // RF = Right forward pin, RR = Right reverse pin
   // This will be replaced later with bare-metal code.
   analogWrite(LR, val);
-  analogWrite(RR, val*0.9);
+  analogWrite(RR, val*0.98);
   analogWrite(LF, 0);
   analogWrite(RF, 0);
 }
@@ -549,9 +548,11 @@ void left(float ang, float speed)
 {
   if(ang == 0)
     deltaTicks = 99999999;
-  else
+  else {
+    ang /= 3;
     deltaTicks = computeDeltaTicks(ang);
-    targetTicks = rightReverseTicksTurns + deltaTicks;
+  }
+  targetTicks = rightReverseTicksTurns + deltaTicks;
     // verify if rightReverseTicksTurns or leftForwardTicksTurns
 
   dir = RIGHT;
@@ -562,7 +563,7 @@ void left(float ang, float speed)
   // We will also replace this code with bare-metal later.
   // To turn right we reverse the right wheel and move
   // the left wheel forward.
-  analogWrite(RR, val);
+  analogWrite(RR, val*0.98);
   analogWrite(LF, val);
   analogWrite(LR, 0);
   analogWrite(RF, 0);
@@ -577,9 +578,11 @@ void right(float ang, float speed)
 {
   if(ang == 0)
     deltaTicks = 99999999;
-  else
+  else {
+    ang /= 3;
     deltaTicks = computeDeltaTicks(ang);
-    targetTicks = leftReverseTicksTurns + deltaTicks;
+  }
+  targetTicks = leftReverseTicksTurns + deltaTicks;
 
   dir = LEFT;
 
@@ -590,7 +593,7 @@ void right(float ang, float speed)
   // To turn left we reverse the left wheel and move
   // the right wheel forward.
   analogWrite(LR, val);
-  analogWrite(RF, val);
+  analogWrite(RF, val*0.98);
   analogWrite(LF, 0);
   analogWrite(RR, 0);
 }
