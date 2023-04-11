@@ -1,10 +1,10 @@
-#include "make_tls_server.h"
-#include "tls_common_lib.h"
-#include "netconstants.h"
+#include "headers/make_tls_server.h"
+#include "headers/tls_common_lib.h"
+#include "headers/netconstants.h"
 #include "Alex/constants.h"
 #include "Alex/packet.h"
-#include "serial.h"
-#include "serialize.h"
+#include "headers/serial.h"
+#include "headers/serialize.h"
 
 /* TODO: Set PORT_NAME to the port name of your Arduino */
 #define PORT_NAME			"/dev/ttyACM0"
@@ -18,10 +18,10 @@
 /* TODO: #define constants for the  filenames for Alex's private key, certificate, CA certificate name,
         and the Common Name for your laptop */
 
-#define KEY_FNAME			"alex.key"
-#define CERT_FNAME			"alex.crt"
-#define CA_CERT_FNAME		"signing.pem"
-#define CLIENT_NAME			"laptop.epp.com"
+#define KEY_FNAME			"network/alex.key"
+#define CERT_FNAME			"network/alex.crt"
+#define CA_CERT_FNAME		"network/signing.pem"
+#define CLIENT_NAME			"network/laptop.epp.com"
 
 /* END TODO */
 
