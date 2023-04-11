@@ -421,12 +421,10 @@ void moveObject() {
 
   distance_check();
 
-  if (distance > (threshold + range)) {
+  if (distance > (threshold + range))
     forward(distance - threshold, speed);
-  }
-  else if (distance < (threshold - range)) {
+  else if (distance < (threshold - range))
     reverse(threshold - distance, speed);
-  }
   else
     stop();
 
