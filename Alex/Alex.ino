@@ -36,6 +36,11 @@ volatile TDirection dir = STOP;
 #define RF                  11  // Right forward pin
 #define RR                  10  // Right reverse pin
 
+void forward(float dist, float speed);
+void reverse(float dist, float speed);
+void left(float angle, float speed);
+void right(float angle, float speed);
+
 // PI, for calculating turn circumference
 #define PI                  3.141592654
 
@@ -405,6 +410,29 @@ void distance_check() {
   delayMicroseconds(2);
   distance = pulseIn(echo, HIGH);
   distance *= soundSpeed / 2;
+}
+
+void moveObject() {
+  const float threshold = 7.0;
+  const float k = 60; // expected speed at 1cm
+  const float range = 0.1;
+  int speed = 60;
+
+  distance_check();
+  while (distance < (threshold - range) || distance > (threshold + range)) {
+    if (distance < (threshold - range)) {
+      speed = (distance - threshold) * k;
+      forward(0, speed);
+    }
+    else if (distance > (threshold + range)) {
+      speed = (threshold - distance) * k;
+      reverse(0, speed);
+    }
+    else
+      stop();
+    distance_check();
+  }
+  clearCounters();
 }
 
 void color_check() {
