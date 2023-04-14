@@ -33,9 +33,9 @@ E-mail: kint.zhao@slamtec.com
 
   </node>
 
-  <node pkg="tf" type="static_transform_publisher" name="alex_tl" args="0.12 0.105 0 0 0 0 base_link TL 100" />
+  <node pkg="tf" type="static_transform_publisher" name="alex_tl" args="0.12 0.11 0 0 0 0 base_link TL 100" />
   <node pkg="tf" type="static_transform_publisher" name="alex_tr" args="0.12 -0.105 0 0 0 0 base_link TR 100" />
-  <node pkg="tf" type="static_transform_publisher" name="alex_bl" args="-0.13 0.105 0 0 0 0 base_link BL 100" />
+  <node pkg="tf" type="static_transform_publisher" name="alex_bl" args="-0.13 0.11 0 0 0 0 base_link BL 100" />
   <node pkg="tf" type="static_transform_publisher" name="alex_br" args="-0.13 -0.105 0 0 0 0 base_link BR 100" />
 
 </launch>

@@ -417,8 +417,8 @@ void distance_check() {
 void moveObject() {
   clearCounters();
   const float threshold = 7.0;
-  const float range = 0.1;
-  const int speed = 60;
+  const float range = 0.5;
+  const int speed = 50;
 
   distance_check();
 
@@ -521,7 +521,7 @@ void forward(float dist, float speed)
   // This will be replaced later with bare-metal code.
 
   analogWrite(LF, val);
-  analogWrite(RF, (int)(val * 0.95));
+  analogWrite(RF, (int)(val * 0.93));
   analogWrite(LR, 0);
   analogWrite(RR, 0);
 }
@@ -553,7 +553,7 @@ void reverse(float dist, float speed)
   // RF = Right forward pin, RR = Right reverse pin
   // This will be replaced later with bare-metal code.
   analogWrite(LR, val);
-  analogWrite(RR, val * 0.95);
+  analogWrite(RR, val * 0.93);
   analogWrite(LF, 0);
   analogWrite(RF, 0);
 }
@@ -596,7 +596,7 @@ void left(float ang, float speed)
   // We will also replace this code with bare-metal later.
   // To turn right we reverse the right wheel and move
   // the left wheel forward.
-  analogWrite(RR, val * 0.95);
+  analogWrite(RR, val * 0.93);
   analogWrite(LF, val);
   analogWrite(LR, 0);
   analogWrite(RF, 0);
@@ -626,7 +626,7 @@ void right(float ang, float speed)
   // To turn left we reverse the left wheel and move
   // the right wheel forward.
   analogWrite(LR, val);
-  analogWrite(RF, val * 0.95);
+  analogWrite(RF, val * 0.93);
   analogWrite(LF, 0);
   analogWrite(RR, 0);
 }
