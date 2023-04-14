@@ -279,6 +279,18 @@ void handleCommand(void *conn, const char *buffer)
 			uartSendPacket(&commandPacket);
 			break;
 
+		case 'r':
+		case 'R':
+			commandPacket.command = COMMAND_GET_RANGE;
+			uartSendPacket(&commandPacket);
+			break;
+
+		case 'h':
+		case 'H':
+			commandPacket.command = COMMAND_HUMP;
+			uartSendPacket(&commandPacket);
+			break;
+
 		default:
 			printf("Bad command\n");
 	}
