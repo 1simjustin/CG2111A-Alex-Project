@@ -4,7 +4,7 @@
 #include "packet.h"
 #include "constants.h"
 
-#include "Arduino.h"
+#include <Arduino.h>
 
 typedef enum {
   STOP = 0,
@@ -407,9 +407,7 @@ void setupMotors()
 // blank.
 void startMotors()
 {
-  TCCR0B = 0b11;
-  TCCR1B = 0b11;
-  TCCR2B = 0b11;
+
 }
 
 void setupColor() {
@@ -425,30 +423,36 @@ void setupColor() {
 }
 
 void distance_check() {
+  digitalWrite(trig, LOW);
+  delayMicroseconds(2);
   digitalWrite(trig, HIGH);
   delayMicroseconds(10);
   digitalWrite(trig, LOW);
-  delayMicroseconds(2);
-  distance = pulseIn(echo, HIGH);
-  distance *= soundSpeed / 2;
+  distance = pulseIn(echo, HIGH) * soundSpeed / 2;
 }
+
+int flag = 0;
+const float threshold = 7.5;
+const float range = 0.5;
 
 void moveObject() {
   clearCounters();
-  const float threshold = 7.0;
-  const float range = 0.1;
-  const int speed = 60;
+  const int speed = 50;
 
   distance_check();
 
-  if (distance > (threshold + range))
-    forward(distance - threshold, speed);
-  else if (distance < (threshold - range))
-    reverse(threshold - distance, speed);
-  else
+  if (distance >= threshold + range) {
+    flag = 1;
+    forward(0, speed);
+  }
+  else if (distance <= threshold - range) {
+    flag = 2;
+    reverse(0, speed);
+  }
+  else {
+    flag = 3;
     stop();
-
-  clearCounters();
+  }
 }
 
 void color_check() {
@@ -470,34 +474,13 @@ void color_check() {
   delay(200);
 }
 
-int calchue(int color[3]) {
-  float max = color[0];
-  float min = color[0];
-
-  for (int i = 1; i < 3; i++) {
-    if (max < color[i])
-      max = color[i];
-    if (min > color[i])
-      min = color[i];
-  }
-
-  if (max == color[0])
-    return (color[2] - color[1]) / (max - min);
-  else if (max == color[1])
-    return 4.0 + (color[0] - color[2]) / (max - min);
-  else if (max == color[2])
-    return 2.0 + (color[1] - color[0]) / (max - min);
-}
-
 void sendColor()
 {
-  int hue = calchue(color);
   char colorNumStr[7];
   for (int i = 0; i < 3; i++) {
     sendMessage(itoa(color[i], colorNumStr, 10));
   }
   sendMessage(itoa(distance, colorNumStr, 10));
-  sendMessage(itoa(hue, colorNumStr, 10));
 }
 
 // Convert percentages to PWM values
@@ -649,6 +632,34 @@ void right(float ang, float speed)
   TCCR0A = 0b10000001;
   TCCR1A = 0b00000001;
   TCCR2A = 0b10000001;
+
+}
+
+void forward_hump(float dist, float speed)
+{
+  // Code to tell us how far to move
+  if (!dist)
+    deltaDist = 999999;
+  else
+    deltaDist = dist;
+
+  newDist = forwardDist + deltaDist;
+
+  dir = FORWARD;
+
+  pwmVal(speed);
+
+  // For now we will ignore dist and move
+  // forward indefinitely. We will fix this
+  // in Week 9.
+
+  // LF = Left forward pin, LR = Left reverse pin
+  // RF = Right forward pin, RR = Right reverse pin
+  // This will be replaced later with bare-metal code.
+
+  TCCR0A = 0b00100001;
+  TCCR1A = 0b00000001;
+  TCCR2A = 0b10000001;
 }
 
 // Stop Alex. To replace with bare-metal code later.
@@ -681,6 +692,16 @@ void clearCounters()
   rightRevs = 0;
   forwardDist = 0;
   reverseDist = 0;
+  deltaDist = 0;
+  newDist = 0;
+  deltaTicks = 0;
+  targetTicks = 0;
+}
+
+void send_range() {
+  distance_check();
+  char colorNumStr[7];
+  sendMessage(itoa(distance, colorNumStr, 10));
 }
 
 void handleCommand(TPacket *command)
@@ -726,13 +747,20 @@ void handleCommand(TPacket *command)
 
     case COMMAND_GET_COLOR:
       moveObject();
-      color_check();
-      sendColor();
       break;
+
+    case COMMAND_GET_RANGE:
+      send_range();
+      break;
+
+    case COMMAND_HUMP:
+      forward_hump(14.5, 100);
 
     default:
       sendBadCommand();
   }
+  if (command -> command != COMMAND_GET_COLOR)
+    flag = 0;
 }
 
 void waitForHello()
@@ -810,7 +838,19 @@ void handlePacket(TPacket *packet)
 // Function to control movement
 
 void movement() {
-  if (deltaDist > 0) {
+  if (flag) {
+    send_range();
+
+    if ((flag == 1 && distance <= threshold - range) || (flag == 2 && distance >= threshold + range) || (flag == 3)) {
+      stop();
+      flag = 0;
+      color_check();
+      sendColor();
+      clearCounters();
+    }
+  }
+
+  else if (deltaDist > 0) {
     if (dir == FORWARD) {
       if (forwardDist >= newDist) {
         deltaDist = 0;
