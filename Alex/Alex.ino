@@ -70,14 +70,6 @@ int color[3] = {0, 0, 0};
 float distance;
 float soundSpeed = 0.0345;
 
-int redFrequency = 0;
-int greenFrequency = 0;
-int blueFrequency = 0;
-
-float redColour = 0;
-float greenColour = 0;
-float blueColour = 0;
-
 /*
       Alex's State Variables
 */
@@ -374,16 +366,14 @@ void writeSerial(const char *buffer, int len)
 
 */
 
-// Set up Alex's motors. Right now this is empty, but
-// later you will replace it with code to set up the PWMs
-// to drive the motors.
+// Set up Alex's motors.
 void setupMotors()
 {
   /* Our motor set up is:
-        A1IN - Pin 5, PD5, OC0B
-        A2IN - Pin 6, PD6, OC0A
-        B1IN - Pin 10, PB2, OC1B
-        B2In - pIN 11, PB3, OC2A
+      A1IN - Pin 5, PD5, OC0B
+      A2IN - Pin 6, PD6, OC0A
+      B1IN - Pin 10, PB2, OC1B
+      B2In - pIN 11, PB3, OC2A
   */
   TCNT0 = 0;
   TCNT1 = 0;
@@ -478,9 +468,9 @@ void sendColor()
 {
   char colorNumStr[7];
   for (int i = 0; i < 3; i++) {
-    sendMessage(itoa(color[i], colorNumStr, 10));
+    sendMessage(itoa(color[i], colorNumStr, 10)); // send color
   }
-  sendMessage(itoa(distance, colorNumStr, 10));
+  sendMessage(itoa(distance, colorNumStr, 10)); // send distance
 }
 
 // Convert percentages to PWM values
@@ -519,14 +509,6 @@ void forward(float dist, float speed)
 
   pwmVal(speed);
 
-  // For now we will ignore dist and move
-  // forward indefinitely. We will fix this
-  // in Week 9.
-
-  // LF = Left forward pin, LR = Left reverse pin
-  // RF = Right forward pin, RR = Right reverse pin
-  // This will be replaced later with bare-metal code.
-
   TCCR0A = 0b00100001;
   TCCR1A = 0b00000001;
   TCCR2A = 0b10000001;
@@ -551,13 +533,6 @@ void reverse(float dist, float speed)
 
   pwmVal(speed);
 
-  // For now we will ignore dist and
-  // reverse indefinitely. We will fix this
-  // in Week 9.
-
-  // LF = Left forward pin, LR = Left reverse pin
-  // RF = Right forward pin, RR = Right reverse pin
-  // This will be replaced later with bare-metal code.
   TCCR0A = 0b10000001;
   TCCR1A = 0b00100001;
   TCCR2A = 0b00000001;
@@ -597,10 +572,6 @@ void left(float ang, float speed)
 
   pwmVal(speed);
 
-  // For now we will ignore ang. We will fix this in Week 9.
-  // We will also replace this code with bare-metal later.
-  // To turn right we reverse the right wheel and move
-  // the left wheel forward.
   TCCR0A = 0b00100001;
   TCCR1A = 0b00100001;
   TCCR2A = 0b00000001;
@@ -625,10 +596,6 @@ void right(float ang, float speed)
 
   pwmVal(speed);
 
-  // For now we will ignore ang. We will fix this in Week 9.
-  // We will also replace this code with bare-metal later.
-  // To turn left we reverse the left wheel and move
-  // the right wheel forward.
   TCCR0A = 0b10000001;
   TCCR1A = 0b00000001;
   TCCR2A = 0b10000001;
@@ -649,20 +616,12 @@ void forward_hump(float dist, float speed)
 
   pwmVal(speed);
 
-  // For now we will ignore dist and move
-  // forward indefinitely. We will fix this
-  // in Week 9.
-
-  // LF = Left forward pin, LR = Left reverse pin
-  // RF = Right forward pin, RR = Right reverse pin
-  // This will be replaced later with bare-metal code.
-
   TCCR0A = 0b00100001;
   TCCR1A = 0b00000001;
   TCCR2A = 0b10000001;
 }
 
-// Stop Alex. To replace with bare-metal code later.
+// Stop Alex
 void stop()
 {
   dir = STOP;
@@ -699,8 +658,8 @@ void clearCounters()
 
 void send_range() {
   distance_check();
-  char colorNumStr[7];
-  sendMessage(itoa(distance, colorNumStr, 10));
+  char distNumStr[7];
+  sendMessage(itoa(distance, distNumStr, 10));
 }
 
 void handleCommand(TPacket *command)
