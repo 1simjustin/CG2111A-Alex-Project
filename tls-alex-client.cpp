@@ -6,7 +6,7 @@
 #include "headers/netconstants.h"
 
 // Packet types, error codes, etc.
-#include "Alex/constants.h"
+#include "headers/constants.h"
 
 // Tells us that the network is running.
 static volatile int networkActive=0;
@@ -189,15 +189,15 @@ void *writerThread(void *conn)
 			case 'W':
 			case 'S':
 				params[0] = 5;
-				params[1] = 80;
+				params[1] = 60;
 				buffer[1] = ch;
 				memcpy(&buffer[2], params, sizeof(params));
 				sendData(conn, buffer, sizeof(buffer));
 				break;
 			case 'A':
 			case 'D':
-				params[0] = 10;
-				params[1] = 80;
+				params[0] = 15;
+				params[1] = 60;
 				buffer[1] = ch;
 				memcpy(&buffer[2], params, sizeof(params));
 				sendData(conn, buffer, sizeof(buffer));
@@ -211,6 +211,10 @@ void *writerThread(void *conn)
 			case 'G':
 			case 'i':
 			case 'I':
+			case 'r':
+			case 'R':
+			case 'h':
+			case 'H':
 				params[0] = 0;
 				params[1] = 0;
 				memcpy(&buffer[2], params, sizeof(params));
