@@ -21,7 +21,7 @@
 #define KEY_FNAME			"network/alex.key"
 #define CERT_FNAME			"network/alex.crt"
 #define CA_CERT_FNAME		"network/signing.pem"
-#define CLIENT_NAME			"network/laptop.epp.com"
+#define CLIENT_NAME			"laptop.epp.com"
 
 /* END TODO */
 
@@ -103,20 +103,20 @@ void handleUARTPacket(TPacket *packet)
 	switch(packet->packetType)
 	{
 		case PACKET_TYPE_COMMAND:
-				// Only we send command packets, so ignore
-			break;
+			// Only we send command packets, so ignore
+		break;
 
 		case PACKET_TYPE_RESPONSE:
-				handleResponse(packet);
-			break;
+			handleResponse(packet);
+		break;
 
 		case PACKET_TYPE_ERROR:
-				handleErrorResponse(packet);
-			break;
+			handleErrorResponse(packet);
+		break;
 
 		case PACKET_TYPE_MESSAGE:
-				handleMessage(packet);
-			break;
+			handleMessage(packet);
+		break;
 	}
 }
 
@@ -276,6 +276,18 @@ void handleCommand(void *conn, const char *buffer)
 		case 'i':
 		case 'I':
 			commandPacket.command = COMMAND_GET_COLOR;
+			uartSendPacket(&commandPacket);
+			break;
+
+		case 'r':
+		case 'R':
+			commandPacket.command = COMMAND_GET_RANGE;
+			uartSendPacket(&commandPacket);
+			break;
+
+		case 'h':
+		case 'H':
+			commandPacket.command = COMMAND_HUMP;
 			uartSendPacket(&commandPacket);
 			break;
 
