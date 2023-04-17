@@ -609,7 +609,6 @@ void stop()
 
 /*
  * Alex's setup and run codes
- * 
  */
 
 // Clears all our counters
@@ -627,50 +626,6 @@ void clearCounters()
   rightRevs=0;
   forwardDist=0;
   reverseDist=0; 
-}
-
-// Clears one particular counter
-void clearOneCounter(int which)
-{
-  clearCounters();
-  /*
-  switch(which)
-  {
-    case 0:
-      clearCounters();
-      break;
-
-    case 1:
-      leftTicks=0;
-      break;
-
-    case 2:
-      rightTicks=0;
-      break;
-
-    case 3:
-      leftRevs=0;
-      break;
-
-    case 4:
-      rightRevs=0;
-      break;
-
-    case 5:
-      forwardDist=0;
-      break;
-
-    case 6:
-      reverseDist=0;
-      break;
-  }
-  */
-}
-// Intialize Vincet's internal states
-
-void initializeState()
-{
-  clearCounters();
 }
 
 void handleCommand(TPacket *command)
@@ -770,7 +725,7 @@ void setup() {
   setupMotors();
   startMotors();
   enablePullups();
-  initializeState();
+  clearCounters();
   sei();
 }
 
