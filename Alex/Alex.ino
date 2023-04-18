@@ -236,14 +236,10 @@ void sendResponse(TPacket *packet)
 /*
    Setup and start codes for external interrupts and
    pullup resistors.
-
 */
 // Enable pull up resistors on pins 2 and 3
 void enablePullups()
 {
-  // Use bare-metal to enable the pull-up resistors on pins
-  // 2 and 3. These are pins PD2 and PD3 respectively.
-  // We set bits 2 and 3 in DDRD to 0 to make them inputs.
   DDRD &= ~(0b00001100);
   PORTD |= 0b00001100;
 }
@@ -288,19 +284,14 @@ void rightISR()
 }
 
 // Set up the external interrupt pins INT0 and INT1
-// for falling edge triggered. Use bare-metal.
+// for falling edge triggered.
 void setupEINT()
 {
-  // Use bare-metal to configure pins 2 and 3 to be
-  // falling edge triggered. Remember to enable
-  // the INT0 and INT1 interrupts.
   EICRA |= 0b00001010;
   EIMSK |= 0b00000011;
 }
 
-// Implement the external interrupt ISRs below.
-// INT0 ISR should call leftISR while INT1 ISR
-// should call rightISR.
+// Implement INT0 and INT1 ISRs.
 
 ISR(INT0_vect)
 {
@@ -312,31 +303,18 @@ ISR(INT1_vect)
   rightISR();
 }
 
-// Implement INT0 and INT1 ISRs above.
-
 /*
    Setup and start codes for serial communications
-
 */
-// Set up the serial connection. For now we are using
-// Arduino Wiring, you will replace this later
-// with bare-metal code.
+// Set up the serial connection.
 void setupSerial()
 {
-  // To replace later with bare-metal.
   Serial.begin(9600);
 }
 
-// Start the serial connection. For now we are using
-// Arduino wiring and this function is empty. We will
-// replace this later with bare-metal code.
+// Start the serial connection.
 
-void startSerial()
-{
-  // Empty for now. To be replaced with bare-metal code
-  // later on.
-
-}
+void startSerial() {}
 
 // Read the serial port. Returns the read character in
 // ch if available. Also returns TRUE if ch is valid.
