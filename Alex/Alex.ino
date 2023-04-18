@@ -22,17 +22,14 @@ volatile TDirection dir = STOP;
 
 // Number of ticks per revolution from the
 // wheel encoder.
-
 #define COUNTS_PER_REV      195
 
 // Wheel circumference in cm.
 // We will use this to calculate forward/backward distance traveled
 // by taking revs * WHEEL_CIRC
-
 #define WHEEL_CIRC          20.42
 
-// Motor control pins. You need to adjust these till
-// Alex moves in the correct direction
+// Motor control pins.
 #define LF                  5   // Left forward pin
 #define LR                  6   // Left reverse pin
 #define RF                  11  // Right forward pin
@@ -47,7 +44,7 @@ void clearCounters();
 // PI, for calculating turn circumference
 #define PI                  3.141592654
 
-// Alex Length & Breadth in cm    // TO BE UPDATED
+// Alex Length & Breadth in cm
 #define ALEX_LENGTH         17.5
 #define ALEX_BREADTH        11
 
@@ -70,16 +67,8 @@ int color[3] = {0, 0, 0};
 float distance;
 float soundSpeed = 0.0345;
 
-int redFrequency = 0;
-int greenFrequency = 0;
-int blueFrequency = 0;
-
-float redColour = 0;
-float greenColour = 0;
-float blueColour = 0;
-
 /*
-      Alex's State Variables
+  Alex's State Variables
 */
 
 // Store the ticks from Alex's left and
@@ -113,9 +102,7 @@ unsigned long targetTicks;
 
 
 /*
-
-   Alex Communication Routines.
-
+  Alex Communication Routines.
 */
 
 TResult readPacket(TPacket *packet)
@@ -149,9 +136,11 @@ void sendStatus()
   statusPacket.packetType = PACKET_TYPE_RESPONSE;
   statusPacket.command = RESP_STATUS;
 
-  unsigned long paramArray[10] = {leftForwardTicks, rightForwardTicks, leftReverseTicks, rightReverseTicks,
-                                  leftForwardTicksTurns, rightForwardTicksTurns, leftReverseTicksTurns, rightReverseTicksTurns, forwardDist, reverseDist
-                                 };
+  unsigned long paramArray[10] = {
+    leftForwardTicks, rightForwardTicks, leftReverseTicks,
+    rightReverseTicks, leftForwardTicksTurns, rightForwardTicksTurns, 
+    leftReverseTicksTurns, rightReverseTicksTurns, forwardDist, reverseDist
+    };
 
   for (int i = 0; i < 10; i++)
     statusPacket.params[i] = paramArray[i];
@@ -244,14 +233,10 @@ void sendResponse(TPacket *packet)
 /*
    Setup and start codes for external interrupts and
    pullup resistors.
-
 */
 // Enable pull up resistors on pins 2 and 3
 void enablePullups()
 {
-  // Use bare-metal to enable the pull-up resistors on pins
-  // 2 and 3. These are pins PD2 and PD3 respectively.
-  // We set bits 2 and 3 in DDRD to 0 to make them inputs.
   DDRD &= ~(0b00001100);
   PORTD |= 0b00001100;
 }
@@ -296,12 +281,9 @@ void rightISR()
 }
 
 // Set up the external interrupt pins INT0 and INT1
-// for falling edge triggered. Use bare-metal.
+// for falling edge triggered.
 void setupEINT()
 {
-  // Use bare-metal to configure pins 2 and 3 to be
-  // falling edge triggered. Remember to enable
-  // the INT0 and INT1 interrupts.
   EICRA |= 0b00001010;
   EIMSK |= 0b00000011;
 }
@@ -309,7 +291,6 @@ void setupEINT()
 // Implement the external interrupt ISRs below.
 // INT0 ISR should call leftISR while INT1 ISR
 // should call rightISR.
-
 ISR(INT0_vect)
 {
   leftISR();
@@ -320,71 +301,52 @@ ISR(INT1_vect)
   rightISR();
 }
 
-// Implement INT0 and INT1 ISRs above.
-
-/*
-   Setup and start codes for serial communications
-
-*/
-// Set up the serial connection. For now we are using
-// Arduino Wiring, you will replace this later
-// with bare-metal code.
+// Set up the serial connection.
 void setupSerial()
 {
-  // To replace later with bare-metal.
-  Serial.begin(9600);
+  UCSR0C = 0b00000110;
+  UBRR0H = 0;
+  UBRR0L = 103;
+  UCSR0A = 0;
 }
 
-// Start the serial connection. For now we are using
-// Arduino wiring and this function is empty. We will
-// replace this later with bare-metal code.
-
+// Start the serial connection.
 void startSerial()
 {
-  // Empty for now. To be replaced with bare-metal code
-  // later on.
-
+  UCSR0B = 0b00011000;
 }
 
 // Read the serial port. Returns the read character in
 // ch if available. Also returns TRUE if ch is valid.
-// This will be replaced later with bare-metal code.
-
 int readSerial(char *buffer)
 {
-
   int count = 0;
 
-  while (Serial.available())
-    buffer[count++] = Serial.read();
+  while (UCSR0A & (1<<7))
+    buffer[count++] = UDR0;
 
   return count;
 }
 
-// Write to the serial port. Replaced later with
-// bare-metal code
-
+// Write to the serial port.
 void writeSerial(const char *buffer, int len)
 {
-  Serial.write(buffer, len);
+  int count = 0;
+
+  while (count < len)
+  {
+    while (!(UCSR0A & (1<<5)));
+    UDR0 = buffer[count++];
+  }
 }
 
 /*
    Alex's motor drivers.
-
 */
 
-// Set up Alex's motors. Right now this is empty, but
-// later you will replace it with code to set up the PWMs
-// to drive the motors.
+// Set up Alex's motors.
 void setupMotors()
 {
-  /* Our motor set up is:
-        A1IN - Pin 5, PD5, OC0B
-        A2IN - Pin 6, PD6, OC0A
-        B1IN - Pin 10, PB2, OC1B
-        B2In - pIN 11, PB3, OC2A
-  */
   TCNT0 = 0;
   TCNT1 = 0;
   TCNT2 = 0;
@@ -403,11 +365,12 @@ void setupMotors()
 }
 
 // Start the PWM for Alex's motors.
-// We will implement this later. For now it is
-// blank.
 void startMotors()
 {
-
+  // Set 64 prescaler for 490Hz PWM freq (16Mhz / 64 * 510)
+  TCCR0B = 0b00000011; 
+  TCCR1B = 0b00000011; 
+  TCCR2B = 0b00000011;
 }
 
 void setupColor() {
@@ -519,14 +482,6 @@ void forward(float dist, float speed)
 
   pwmVal(speed);
 
-  // For now we will ignore dist and move
-  // forward indefinitely. We will fix this
-  // in Week 9.
-
-  // LF = Left forward pin, LR = Left reverse pin
-  // RF = Right forward pin, RR = Right reverse pin
-  // This will be replaced later with bare-metal code.
-
   TCCR0A = 0b00100001;
   TCCR1A = 0b00000001;
   TCCR2A = 0b10000001;
@@ -551,13 +506,6 @@ void reverse(float dist, float speed)
 
   pwmVal(speed);
 
-  // For now we will ignore dist and
-  // reverse indefinitely. We will fix this
-  // in Week 9.
-
-  // LF = Left forward pin, LR = Left reverse pin
-  // RF = Right forward pin, RR = Right reverse pin
-  // This will be replaced later with bare-metal code.
   TCCR0A = 0b10000001;
   TCCR1A = 0b00100001;
   TCCR2A = 0b00000001;
@@ -571,7 +519,6 @@ unsigned long computeDeltaTicks (float ang) {
   // # of wheel revolutions to make 1 full 360 turn is alexCirc / WHEEL_CIRC
   // For ang degrees, (ang * alexCirc) / (360 * WHEEL_CIRC)
   // To convert to ticks, we multiply by COUNTS_PER_REV
-
   unsigned long ticks = (unsigned long) ((ang * alexCirc * COUNTS_PER_REV) / (360 * WHEEL_CIRC));
 
   return ticks;
@@ -591,16 +538,11 @@ void left(float ang, float speed)
     deltaTicks = computeDeltaTicks(ang);
   }
   targetTicks = rightReverseTicksTurns + deltaTicks;
-  // verify if rightReverseTicksTurns or leftForwardTicksTurns
 
   dir = RIGHT;
 
   pwmVal(speed);
 
-  // For now we will ignore ang. We will fix this in Week 9.
-  // We will also replace this code with bare-metal later.
-  // To turn right we reverse the right wheel and move
-  // the left wheel forward.
   TCCR0A = 0b00100001;
   TCCR1A = 0b00100001;
   TCCR2A = 0b00000001;
@@ -625,10 +567,6 @@ void right(float ang, float speed)
 
   pwmVal(speed);
 
-  // For now we will ignore ang. We will fix this in Week 9.
-  // We will also replace this code with bare-metal later.
-  // To turn left we reverse the left wheel and move
-  // the right wheel forward.
   TCCR0A = 0b10000001;
   TCCR1A = 0b00000001;
   TCCR2A = 0b10000001;
@@ -649,20 +587,12 @@ void forward_hump(float dist, float speed)
 
   pwmVal(speed);
 
-  // For now we will ignore dist and move
-  // forward indefinitely. We will fix this
-  // in Week 9.
-
-  // LF = Left forward pin, LR = Left reverse pin
-  // RF = Right forward pin, RR = Right reverse pin
-  // This will be replaced later with bare-metal code.
-
   TCCR0A = 0b00100001;
   TCCR1A = 0b00000001;
   TCCR2A = 0b10000001;
 }
 
-// Stop Alex. To replace with bare-metal code later.
+// Stop Alex.
 void stop()
 {
   dir = STOP;
@@ -674,7 +604,6 @@ void stop()
 
 /*
    Alex's setup and run codes
-
 */
 
 // Clears all our counters
@@ -700,8 +629,8 @@ void clearCounters()
 
 void send_range() {
   distance_check();
-  char colorNumStr[7];
-  sendMessage(itoa(distance, colorNumStr, 10));
+  char distNumStr[7];
+  sendMessage(itoa(distance, distNumStr, 10));
 }
 
 void handleCommand(TPacket *command)
@@ -781,26 +710,24 @@ void waitForHello()
     {
       if (hello.packetType == PACKET_TYPE_HELLO)
       {
-
-
         sendOK();
         exit = 1;
       }
       else
         sendBadResponse();
     }
+
     else if (result == PACKET_BAD)
     {
       sendBadPacket();
     }
+
     else if (result == PACKET_CHECKSUM_BAD)
       sendBadChecksum();
-  } // !exit
+  }
 }
 
 void setup() {
-  // put your setup code here, to run once:
-
   cli();
   setupEINT();
   setupSerial();
@@ -836,7 +763,6 @@ void handlePacket(TPacket *packet)
 }
 
 // Function to control movement
-
 void movement() {
   if (flag) {
     send_range();
@@ -875,8 +801,7 @@ void movement() {
   }
 }
 
-// Function to control rotation
-
+// Function to control turning
 void turning() {
   if (deltaTicks >= 0) {
     if (dir == LEFT) {
