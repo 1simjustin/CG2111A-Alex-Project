@@ -736,6 +736,7 @@ void setup() {
   clearCounters();
   sei();
   setupColor();
+  waitForHello();
 }
 
 void handlePacket(TPacket *packet)

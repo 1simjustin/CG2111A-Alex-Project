@@ -102,12 +102,8 @@ void sendData(void *conn, const char *buffer, int len)
 	printf("\nSENDING %d BYTES DATA\n\n", len);
 	if(networkActive)
 	{
-		/* TODO: Insert SSL write here to write buffer to network */
-
-		// int sslWrite(void *conn, const char *buffer, int len);
 		c = sslWrite(conn, buffer, sizeof(buffer));
 
-		/* END TODO */	
 		networkActive = (c > 0);
 	}
 }
@@ -119,13 +115,8 @@ void *readerThread(void *conn)
 
 	while(networkActive)
 	{
-		/* TODO: Insert SSL read here into buffer */
-
-        // int sslRead(void *conn, char *buffer, int len);
 		len = sslRead(conn, buffer, sizeof(buffer));
 		printf("read %d bytes from server.\n", len);
-		
-		/* END TODO */
 
 		networkActive = (len > 0);
 
@@ -135,11 +126,7 @@ void *readerThread(void *conn)
 
 	printf("Exiting network listener thread\n");
     
-    /* TODO: Stop the client loop and call EXIT_THREAD */
-
 	EXIT_THREAD(conn);
-
-    /* END TODO */
 }
 
 void flushInput()
@@ -232,15 +219,8 @@ void *writerThread(void *conn)
 
 	printf("Exiting keyboard thread\n");
 
-    /* TODO: Stop the client loop and call EXIT_THREAD */
-
 	EXIT_THREAD(conn);
-
-    /* END TODO */
 }
-
-/* TODO: #define filenames for the client private key, certificatea,
-   CA filename, etc. that you need to create a client */
 
 #define SERVER_NAME 			"172.20.10.11"
 #define CA_CERT_FNAME 			"network/signing.pem"
@@ -249,15 +229,9 @@ void *writerThread(void *conn)
 #define CLIENT_KEY_FNAME 		"network/laptop.key"
 #define SERVER_NAME_ON_CERT 	"alex.epp.com"
 
-/* END TODO */
 void connectToServer(const char *serverName, int portNum)
 {
-    /* TODO: Create a new client */
-
-	// void createClient(const char *serverName, const int serverPort, int verifyServer, const char *caCertFname, const char *serverNameOnCert, int sendCert, const char *clientCertFname, const char *clientPrivateKey, void *(*readerThread)(void *), void *(*writerThread)(void *));
 	createClient(SERVER_NAME, PORT_NUM, 1, CA_CERT_FNAME, SERVER_NAME_ON_CERT, 1, CLIENT_CERT_FNAME, CLIENT_KEY_FNAME, readerThread, writerThread);
-
-    /* END TODO */
 }
 
 int main(int ac, char **av)
@@ -271,11 +245,7 @@ int main(int ac, char **av)
     networkActive = 1;
     connectToServer(av[1], atoi(av[2]));
 
-    /* TODO: Add in while loop to prevent main from exiting while the
-    client loop is running */
-
 	while (client_is_running());
 
-    /* END TODO */
 	printf("\nMAIN exiting\n\n");
 }
