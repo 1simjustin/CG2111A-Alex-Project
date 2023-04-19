@@ -22,17 +22,14 @@ volatile TDirection dir = STOP;
 
 // Number of ticks per revolution from the
 // wheel encoder.
-
 #define COUNTS_PER_REV      195
 
 // Wheel circumference in cm.
 // We will use this to calculate forward/backward distance traveled
 // by taking revs * WHEEL_CIRC
-
 #define WHEEL_CIRC          20.42
 
-// Motor control pins. You need to adjust these till
-// Alex moves in the correct direction
+// Motor control pins.
 #define LF                  5   // Left forward pin
 #define LR                  6   // Left reverse pin
 #define RF                  11  // Right forward pin
@@ -47,7 +44,7 @@ void clearCounters();
 // PI, for calculating turn circumference
 #define PI                  3.141592654
 
-// Alex Length & Breadth in cm    // TO BE UPDATED
+// Alex Length & Breadth in cm
 #define ALEX_LENGTH         17.5
 #define ALEX_BREADTH        11
 
@@ -71,7 +68,7 @@ float distance;
 float soundSpeed = 0.0345;
 
 /*
-      Alex's State Variables
+  Alex's State Variables
 */
 
 // Store the ticks from Alex's left and
@@ -105,9 +102,7 @@ unsigned long targetTicks;
 
 
 /*
-
-   Alex Communication Routines.
-
+  Alex Communication Routines.
 */
 
 TResult readPacket(TPacket *packet)
@@ -141,9 +136,11 @@ void sendStatus()
   statusPacket.packetType = PACKET_TYPE_RESPONSE;
   statusPacket.command = RESP_STATUS;
 
-  unsigned long paramArray[10] = {leftForwardTicks, rightForwardTicks, leftReverseTicks, rightReverseTicks,
-                                  leftForwardTicksTurns, rightForwardTicksTurns, leftReverseTicksTurns, rightReverseTicksTurns, forwardDist, reverseDist
-                                 };
+  unsigned long paramArray[10] = {
+    leftForwardTicks, rightForwardTicks, leftReverseTicks,
+    rightReverseTicks, leftForwardTicksTurns, rightForwardTicksTurns, 
+    leftReverseTicksTurns, rightReverseTicksTurns, forwardDist, reverseDist
+    };
 
   for (int i = 0; i < 10; i++)
     statusPacket.params[i] = paramArray[i];
@@ -291,8 +288,9 @@ void setupEINT()
   EIMSK |= 0b00000011;
 }
 
-// Implement INT0 and INT1 ISRs.
-
+// Implement the external interrupt ISRs below.
+// INT0 ISR should call leftISR while INT1 ISR
+// should call rightISR.
 ISR(INT0_vect)
 {
   leftISR();
@@ -303,56 +301,50 @@ ISR(INT1_vect)
   rightISR();
 }
 
-/*
-   Setup and start codes for serial communications
-*/
 // Set up the serial connection.
 void setupSerial()
 {
-  Serial.begin(9600);
+  UCSR0C = 0b00000110;
+  UBRR0H = 0;
+  UBRR0L = 103;
+  UCSR0A = 0;
 }
 
 // Start the serial connection.
-
-void startSerial() {}
+void startSerial()
+{
+  UCSR0B = 0b00011000;
+}
 
 // Read the serial port. Returns the read character in
 // ch if available. Also returns TRUE if ch is valid.
-// This will be replaced later with bare-metal code.
-
 int readSerial(char *buffer)
 {
-
   int count = 0;
 
-  while (Serial.available())
-    buffer[count++] = Serial.read();
+  while (UCSR0A & (1<<7))
+    buffer[count++] = UDR0;
 
   return count;
 }
 
-// Write to the serial port. Replaced later with
-// bare-metal code
-
+// Write to the serial port.
 void writeSerial(const char *buffer, int len)
 {
-  Serial.write(buffer, len);
+  for (int i; i < len; i++)
+  {
+    while (!(UCSR0A & (1<<5)));
+    UDR0 = buffer[i];
+  }
 }
 
 /*
    Alex's motor drivers.
-
 */
 
 // Set up Alex's motors.
 void setupMotors()
 {
-  /* Our motor set up is:
-      A1IN - Pin 5, PD5, OC0B
-      A2IN - Pin 6, PD6, OC0A
-      B1IN - Pin 10, PB2, OC1B
-      B2In - pIN 11, PB3, OC2A
-  */
   TCNT0 = 0;
   TCNT1 = 0;
   TCNT2 = 0;
@@ -371,11 +363,12 @@ void setupMotors()
 }
 
 // Start the PWM for Alex's motors.
-// We will implement this later. For now it is
-// blank.
 void startMotors()
 {
-
+  // Set 64 prescaler for 490Hz PWM freq (16Mhz / 64 * 510)
+  TCCR0B = 0b00000011; 
+  TCCR1B = 0b00000011; 
+  TCCR2B = 0b00000011;
 }
 
 void setupColor() {
@@ -446,9 +439,9 @@ void sendColor()
 {
   char colorNumStr[7];
   for (int i = 0; i < 3; i++) {
-    sendMessage(itoa(color[i], colorNumStr, 10)); // send color
+    sendMessage(itoa(color[i], colorNumStr, 10));
   }
-  sendMessage(itoa(distance, colorNumStr, 10)); // send distance
+  sendMessage(itoa(distance, colorNumStr, 10));
 }
 
 // Convert percentages to PWM values
@@ -524,7 +517,6 @@ unsigned long computeDeltaTicks (float ang) {
   // # of wheel revolutions to make 1 full 360 turn is alexCirc / WHEEL_CIRC
   // For ang degrees, (ang * alexCirc) / (360 * WHEEL_CIRC)
   // To convert to ticks, we multiply by COUNTS_PER_REV
-
   unsigned long ticks = (unsigned long) ((ang * alexCirc * COUNTS_PER_REV) / (360 * WHEEL_CIRC));
 
   return ticks;
@@ -544,7 +536,6 @@ void left(float ang, float speed)
     deltaTicks = computeDeltaTicks(ang);
   }
   targetTicks = rightReverseTicksTurns + deltaTicks;
-  // verify if rightReverseTicksTurns or leftForwardTicksTurns
 
   dir = RIGHT;
 
@@ -599,7 +590,7 @@ void forward_hump(float dist, float speed)
   TCCR2A = 0b10000001;
 }
 
-// Stop Alex
+// Stop Alex.
 void stop()
 {
   dir = STOP;
@@ -610,7 +601,7 @@ void stop()
 }
 
 /*
-  Alex's setup and run codes
+   Alex's setup and run codes
 */
 
 // Clears all our counters
@@ -723,18 +714,18 @@ void waitForHello()
       else
         sendBadResponse();
     }
+
     else if (result == PACKET_BAD)
     {
       sendBadPacket();
     }
+
     else if (result == PACKET_CHECKSUM_BAD)
       sendBadChecksum();
-  } // !exit
+  }
 }
 
 void setup() {
-  // put your setup code here, to run once:
-
   cli();
   setupEINT();
   setupSerial();
@@ -770,7 +761,6 @@ void handlePacket(TPacket *packet)
 }
 
 // Function to control movement
-
 void movement() {
   if (flag) {
     send_range();
@@ -809,8 +799,7 @@ void movement() {
   }
 }
 
-// Function to control rotation
-
+// Function to control turning
 void turning() {
   if (deltaTicks >= 0) {
     if (dir == LEFT) {
