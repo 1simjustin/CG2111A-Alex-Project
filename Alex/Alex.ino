@@ -331,12 +331,10 @@ int readSerial(char *buffer)
 // Write to the serial port.
 void writeSerial(const char *buffer, int len)
 {
-  int count = 0;
-
-  while (count < len)
+  for (int i; i < len; i++)
   {
     while (!(UCSR0A & (1<<5)));
-    UDR0 = buffer[count++];
+    UDR0 = buffer[i];
   }
 }
 
