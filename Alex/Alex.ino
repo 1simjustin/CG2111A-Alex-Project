@@ -17,7 +17,7 @@ typedef enum {
 volatile TDirection dir = STOP;
 
 /*
-   Alex's configuration constants
+  Alex's configuration constants
 */
 
 // Number of ticks per revolution from the
@@ -339,7 +339,7 @@ void writeSerial(const char *buffer, int len)
 }
 
 /*
-   Alex's motor drivers.
+  Alex's motor drivers.
 */
 
 // Set up Alex's motors.
@@ -601,7 +601,7 @@ void stop()
 }
 
 /*
-   Alex's setup and run codes
+  Alex's setup and run codes
 */
 
 // Clears all our counters
