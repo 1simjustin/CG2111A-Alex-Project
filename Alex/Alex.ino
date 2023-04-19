@@ -455,10 +455,10 @@ void pwmVal(float speed)
 
   int val = (int) ((speed / 100.0) * 255.0);
 
-  OCR0A = val * 0.9;
-  OCR0B = val * 0.9;
-  OCR1B = val;
-  OCR2A = val;
+  OCR0A = val;
+  OCR0B = val;
+  OCR1B = val * 0.9;
+  OCR2A = val * 0.9;
 }
 
 // Move Alex forward "dist" cm at speed "speed".
