@@ -4,7 +4,7 @@
 #include "packet.h"
 #include "constants.h"
 
-#include <Arduino.h>
+#include "Arduino.h"
 
 typedef enum {
   STOP = 0,
